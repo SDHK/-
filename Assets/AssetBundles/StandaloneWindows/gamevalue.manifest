@@ -1,0 +1,23 @@
+ManifestFileVersion: 0
+CRC: 3117653900
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 082410817f1af1ab88849ea3c963cea8
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 903154d5199da34054630a3c5c3a6fe6
+HashAppended: 0
+ClassTypes:
+- Class: 114
+  Script: {fileID: 11500000, guid: 0b2db86121404754db890f4c8dfe81b2, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1ebca9c35959b0f438640de86476cb3b, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: d7fd9488000d3734a9e00ee676215985, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetsPackage/UI/Pfb/0Canvas/Global Volume Profile.asset
+- Assets/AssetsPackage/Value/GameValue.asset
+Dependencies: []

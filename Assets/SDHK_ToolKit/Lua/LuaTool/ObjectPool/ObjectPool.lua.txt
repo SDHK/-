@@ -1,0 +1,64 @@
+--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2021/12/19 10:06:47
+
+ * 最后日期: 2021/12/19 10:06:48
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "ObjectItem"
+
+-- 对象池
+ObjectPool = {}
+
+-- 新建池
+function ObjectPool.New(table)
+    local newPool = LuaObjectPool(table)
+    newPool.NewObject = ObjectPool.ObjectNew
+    newPool.DestroyObject = ObjectPool.ObjectDestroy
+    newPool.objectOnNew = ObjectPool.ObjectOnNew
+    newPool.objectOnGet = ObjectPool.ObjectOnGet
+    newPool.objectOnRecycle = ObjectPool.ObjectOnRecycle
+    newPool.objectOnDestroy = ObjectPool.ObjectOnDestroy
+    return newPool
+end
+
+
+-- 新建对象的方法
+function ObjectPool.ObjectNew(pool)
+    local newTable = pool.table:New()
+    newTable.selfPool = pool
+    return newTable
+end
+
+
+function ObjectPool.ObjectDestroy(obj)
+    obj = nil
+end
+
+
+function ObjectPool.ObjectOnNew(obj)
+    obj:ObjectOnNew()
+end
+
+
+function ObjectPool.ObjectOnGet(obj)
+    obj:ObjectOnGet()
+end
+
+
+function ObjectPool.ObjectOnRecycle(obj)
+    obj:ObjectOnRecycle()
+end
+
+
+function ObjectPool.ObjectOnDestroy(obj)
+    obj:ObjectOnDestroy()
+end
+
+

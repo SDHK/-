@@ -1,0 +1,32 @@
+
+
+--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2021/12/24 16:41:09
+
+ * 最后日期: 2021/12/24 16:41:09
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+
+-- 全局数据 CS.PathAssets.PathAssetGlobal.Assets 
+GlobalAsset = CS.PathAssets.PathAssetGlobal.Assets
+
+-- LuaMono对象池 CS.ObjectFactory.LuaMonoObjectPool
+LuaMonoObjectPool = CS.ObjectFactory.LuaMonoObjectPool
+-- LuaMono对象 CS.ObjectFactory.LuaMonoObject
+LuaMonoObject = CS.ObjectFactory.LuaMonoObject
+-- Lua对象池 CS.ObjectFactory.LuaObjectPool
+LuaObjectPool = CS.ObjectFactory.LuaObjectPool
+
+local util = require 'xlua.util'
+-- 异步延迟 CS.AsyncAwaitEvent.LuaAsyncAwait.AsyncDelay()
+AsyncDelay = util.async_to_sync(CS.AsyncAwaitEvent.LuaAsyncAwait.AsyncDelay)
+-- 异步等待 CS.AsyncAwaitEvent.LuaAsyncAwait.AsyncWait()
+AsyncWait = util.async_to_sync(CS.AsyncAwaitEvent.LuaAsyncAwait.AsyncWait)
+

@@ -1,0 +1,46 @@
+--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2021/12/20 18:59:53
+
+ * 最后日期: 2021/12/20 18:59:53
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+-- 对象池对象接口
+using "Object"
+
+ObjectItem = Object:Extend({
+    TableName = "ObjectItem",
+    selfPool = nil
+})
+
+function ObjectItem:ObjectOnNew()
+    -- print("Lua对象新建")
+end
+
+
+function ObjectItem:ObjectOnGet()
+    -- print("Lua对象获取")
+end
+
+
+function ObjectItem:ObjectOnRecycle()
+    -- print("Lua对象回收")
+end
+
+
+function ObjectItem:ObjectOnDestroy()
+    -- print("Lua对象销毁")
+end
+
+
+function ObjectItem:ObjectRecycle()
+    self.selfPool:Recycle(self)
+end
+
+

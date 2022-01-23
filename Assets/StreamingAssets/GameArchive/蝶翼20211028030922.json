@@ -1,0 +1,26 @@
+{
+    "ArchiveName": "蝶翼20211028030922.json",
+    "gameMaps": [
+        "Test001"
+    ],
+    "playerEquipment": {
+        "weapon": "武器1疾锋",
+        "wing": "机翼1锋棱",
+        "body": "主体1护盾",
+        "special": "特殊1辐光"
+    },
+    "playerArsenal": {
+        "weapon": [
+            "武器1疾锋"
+        ],
+        "wing": [
+            "机翼1锋棱"
+        ],
+        "body": [
+            "主体1护盾"
+        ],
+        "special": [
+            "特殊1辐光"
+        ]
+    }
+}

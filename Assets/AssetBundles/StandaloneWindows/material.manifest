@@ -1,0 +1,37 @@
+ManifestFileVersion: 0
+CRC: 862812909
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: bacd625a58dc59ec75d79536f9b00d65
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 7b58e8929cf592a1ce1fdc865511b46a
+HashAppended: 0
+ClassTypes:
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 84
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetsPackage/Material/Color/I1C1.mat
+- Assets/AssetsPackage/Material/Color/UIC1.mat
+- Assets/AssetsPackage/Material/ImageScroll.mat
+- Assets/AssetsPackage/Material/ImageRotation.mat
+- Assets/AssetsPackage/Material/Stars.mat
+- Assets/AssetsPackage/Material/Color/I2C2.mat
+- Assets/AssetsPackage/Material/Color/I2C3.mat
+- Assets/AssetsPackage/Material/Phantom_M.mat
+- Assets/AssetsPackage/Material/Color/UIC2.mat
+- Assets/AssetsPackage/Material/Color/I2C4.mat
+- Assets/AssetsPackage/Material/Color/UICText.mat
+- Assets/AssetsPackage/Material/ImagerRotation2.mat
+- Assets/AssetsPackage/Material/Color/UIC3.mat
+- Assets/AssetsPackage/Material/Color/I2C1.mat
+Dependencies:
+- E:/Make/GameEngine/Unity3D/2019_4_15f/3D/RainbowButterfly/Assets/AssetBundles/StandaloneWindows/pic_aircaraft
+- E:/Make/GameEngine/Unity3D/2019_4_15f/3D/RainbowButterfly/Assets/AssetBundles/StandaloneWindows/shader

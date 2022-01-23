@@ -1,0 +1,17 @@
+ManifestFileVersion: 0
+CRC: 862952124
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: cube_p
+      Dependencies: {}
+    Info_1:
+      Name: ui001/ab3
+      Dependencies: {}
+    Info_2:
+      Name: ui001/ui
+      Dependencies:
+        Dependency_0: image
+    Info_3:
+      Name: image
+      Dependencies: {}

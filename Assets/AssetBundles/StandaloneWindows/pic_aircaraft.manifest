@@ -1,0 +1,23 @@
+ManifestFileVersion: 0
+CRC: 276197642
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: d2f3e93fc3db6b6f955d51ca49a4fc0a
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: c90fc19e2679e5295d10bd00f33cb4c3
+HashAppended: 0
+ClassTypes:
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+Assets:
+- "Assets/AssetsPackage/Picture/Aircraft/Player/Body/\u4E3B\u4F531\u62A4\u76FE.png"
+- "Assets/AssetsPackage/Picture/Aircraft/Player/Core/\u6838\u5FC3.png"
+- "Assets/AssetsPackage/Picture/Aircraft/Player/Wing/\u673A\u7FFC1\u950B\u68F1\u5185.png"
+- "Assets/AssetsPackage/Picture/Aircraft/Player/Special/\u7279\u6B8A1\u8F90\u5149.png"
+- "Assets/AssetsPackage/Picture/Aircraft/Player/Wing/\u673A\u7FFC1\u950B\u68F1.png"
+- "Assets/AssetsPackage/Picture/Aircraft/Player/Weapons/\u6B66\u56681\u75BE\u950B.png"
+Dependencies: []

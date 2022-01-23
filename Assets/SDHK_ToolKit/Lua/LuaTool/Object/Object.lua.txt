@@ -1,0 +1,147 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2021/12/18 17:53:44
+
+ * 最后日期: 2021/12/18 17:57:03
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+    Lua 面向对象的 Object 基类
+
+--]] --------------------
+-- Object 基类
+Object = {
+    TableName = "Object"
+}
+
+-- 新建对象
+function Object:New()
+    return New(self)
+end
+
+
+-- 获取继承的子类
+function Object:Extend()
+    return Extend(self)
+end
+
+
+-- 获取继承的子类
+function Object:Extend(SubObject)
+    SubObject = SubObject or {}
+    setmetatable(SubObject, self)
+    self.__index = self
+    return SubObject
+end
+
+
+-- 判断对象
+function Object:Is(BaseTable)
+    return Is(self, BaseTable)
+end
+
+
+-- 判断对象
+function Is(selfTable, BaseTable)
+    if selfTable == nil or BaseTable == nil then
+        return false
+    else
+        if selfTable.TableName == BaseTable.TableName then
+            return true
+        else
+            local selfTableMetatable = getmetatable(selfTable)
+            return Is(selfTableMetatable, BaseTable)
+        end
+    end
+end
+
+
+-- 新建对象
+function New(BaseTable)
+    local SubObject = {}
+    setmetatable(SubObject, BaseTable)
+    BaseTable.__index = BaseTable
+    return SubObject
+end
+
+
+-- 获取继承的子类
+function Extend(BaseTable)
+    local SubObject = {}
+    setmetatable(SubObject, BaseTable)
+    BaseTable.__index = BaseTable
+    return SubObject
+end
+
+
+-- return Object
+
+-- !测试：尝试用table继承C#的类
+-- 获取扩展的C#实例的表
+function NewCS1(BaseClass)
+    local SubObject = {}
+    SubObject.CSBase = BaseClass
+
+    setmetatable(SubObject, SubObject)
+
+    -- SubObject.__index = function(tab, key)
+    --     return tab.CSBase[key]
+    -- end
+
+    -- SubObject.Bfunc = function(tab, ...) -- !成功关键
+    --     tab.CSBase["pr1"](tab.CSBase, ...)
+    -- end
+
+    -- SubObject.__index = function(tab, key)
+
+    --     rawset(tab, key, tab.CSBase[key])
+    --     return tab[key]
+    -- end
+
+    SubObject.__index = function(tab, key)
+
+        local keyFuncTable = {}
+        keyFuncTable.key = key
+        keyFuncTable.base = tab.CSBase
+
+        setmetatable(keyFuncTable, {
+            __call = function(funcTable, tab, ...)
+                return funcTable.base[funcTable.key](funcTable.base, ...)
+            end
+        })
+
+        rawset(tab, key, keyFuncTable)
+        return tab[key]
+    end
+
+
+    return SubObject
+end
+
+
+-- 设置__call属性,可以吧表当成函数使用
+
+-- 获取 继承 扩展的C#实例的 子类表
+-- function NewCS(BaseTable,BaseClass)
+--     setmetatable(BaseTable, BaseClass.userdata)
+
+--     local SubObject = {}
+--     setmetatable(SubObject, BaseTable)
+--     BaseTable.__index = BaseTable
+--     return SubObject
+-- end
+
+--[[
+api文档：
+class或者 struct的实例:
+从C#传一个class或者struct的实例，将映射到Lua的userdata，并通过__index访问该userdata的成员
+C#侧指明从Lua侧输入指定类型对象，Lua侧为该类型实例的userdata可以直接使用；
+如果该指明类型有默认构造函数，Lua侧是table则会自动转换，转换规则是：
+调用构造函数构造实例，并用table对应字段转换到c#对应值后赋值各成员。
+
+--]]
+

@@ -1,0 +1,19 @@
+ManifestFileVersion: 0
+CRC: 2685971936
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 135c91c1c00ea28eabc818e474e79c9f
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 55d48f4ad9c3b13330b9eb5ee5686477
+HashAppended: 0
+ClassTypes:
+- Class: 48
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetsPackage/Material/Shader/HighLight2D.shadergraph
+- Assets/AssetsPackage/Material/Shader/ImageRotation2D.shadergraph
+- Assets/AssetsPackage/Material/Shader/ImageScroll2D.shadergraph
+- Assets/AssetsPackage/Material/Shader/Stars2D.shadergraph
+Dependencies: []

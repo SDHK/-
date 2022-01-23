@@ -1,0 +1,23 @@
+ManifestFileVersion: 0
+CRC: 39045158
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: d66403fd4c9524d776d203df65e363ba
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 5ad585dd02dfb5016c0dad519eab8f49
+HashAppended: 0
+ClassTypes:
+- Class: 49
+  Script: {instanceID: 0}
+Assets:
+- Assets/SDHK_ToolKit/Lua/LuaTool/ObjectPool/ObjectPool.lua.txt
+- Assets/SDHK_ToolKit/Lua/LuaTool/Object/Object.lua.txt
+- Assets/SDHK_ToolKit/Lua/LuaTool/0Requires/SDHK_ToolKit.lua.txt
+- Assets/SDHK_ToolKit/Lua/LuaTool/0Requires/UnityEngine.lua.txt
+- Assets/SDHK_ToolKit/Lua/LuaTool/ObjectPool/ObjectItem.lua.txt
+- Assets/SDHK_ToolKit/Lua/LuaTool/0Requires/LuaToolRequires.lua.txt
+- Assets/SDHK_ToolKit/Lua/LuaTool/ObjectPool/MonoObjectItem.lua.txt
+- Assets/SDHK_ToolKit/Lua/LuaTool/ObjectPool/MonoObjectPool.lua.txt
+Dependencies: []
