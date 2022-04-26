@@ -1,0 +1,49 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/15 21:05:45
+
+ * 最后日期: 2022/02/15 21:06:21
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaMonoObjectPoolBuilder"
+using "LuaMonoSingletonItem"
+
+-- Mono对象池对象
+UICanvas = LuaMonoSingletonItem:Extend({TableName = "UICanvas"})
+UICanvas.pool =
+    LuaMonoObjectPoolBuilder.Construct(
+    UICanvas,
+    GlobalAsset:Get(CD.ABpfb_ui, CD.AB_UICanvasBox, typeof(GameObject):ToString())
+)
+
+-- 获取对象
+function UICanvas.Get()
+    return UICanvas.pool:GetTable()
+end
+
+-- 获取对象，并设置父物体
+function UICanvas.Get(parent)
+    return UICanvas.pool:GetTable(parent)
+end
+
+function UICanvas:ObjectOnNew()
+    self.camera = self.gameObject:FindChildDeep(CD.AB_UICamera):GetComponent(typeof(Camera))
+end
+
+function UICanvas:ObjectOnDestroy()
+end
+
+function UICanvas:ObjectOnGet()
+end
+
+function UICanvas:ObjectOnRecycle()
+end
+
+function UICanvas:MonoUpdate()
+end

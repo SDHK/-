@@ -1,0 +1,153 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/11 21:17:55
+
+ * 最后日期: 2022/02/11 21:18:19
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaMonoObjectPoolBuilder"
+
+Script "ScrollListDropdownEnum"
+Script "ScrollListToggle"
+Script "ScrollListInputField"
+Script "ScrollListButton"
+Script "WindowClock"
+Script "WindowConfirm"
+
+-- Mono对象池对象
+PageScreen = LuaMonoObjectItem:Extend({
+    TableName = "PageScreen"
+})
+PageScreen.pool = LuaMonoObjectPoolBuilder.Construct(PageScreen, GlobalAsset:Get(CD.ABpfb_ui, CD.AB_PageScreen,
+    typeof(GameObject):ToString()))
+PageScreen.pool.objectDestoryClock = 600
+PageScreen.pool.objectLimit = 1
+
+-- 获取对象
+function PageScreen.Get()
+    return PageScreen.pool:GetTable()
+end
+
+
+-- 获取对象，并设置父物体
+function PageScreen.Get(parent)
+    return PageScreen.pool:GetTable(parent)
+end
+
+
+function PageScreen:ObjectOnNew()
+    self.focusState = LuaFocusStateBuilder.Construct(self)
+    self.languageManager = LanguageManager.Instance()
+    self.screenManager = ScreenManager.Instance()
+
+    local gameObject = self.gameObject
+
+    self.canvasGroup = gameObject:SetComponent(typeof(CanvasGroup))
+
+    self.content = gameObject:SetComponent(typeof(Transform), "Content")
+    self.defaultSettingsBtn = gameObject:SetComponent(typeof(Button), "DefaultSettingsBtn")
+    self.defaultSettingsBtn.gameObject:SetComponent(typeof(LanguageText), "Text"):SetPath(
+        "游戏设置窗口/恢复默认设置")
+
+    self.screenMode = ScrollListDropdownEnum.Get(self.content)
+    self.screenTop = ScrollListToggle.Get(self.content)
+    self.screenWidth = ScrollListInputField.Get(self.content)
+    self.screenHeight = ScrollListInputField.Get(self.content)
+    self.screenAutoFit = ScrollListButton.Get(self.content)
+    self.screenSaveConfirm = ScrollListButton.Get(self.content)
+
+end
+
+
+function PageScreen:ObjectOnDestroy()
+    self.defaultSettingsBtn.onClick:RemoveAllListeners()
+end
+
+
+function PageScreen:ObjectOnGet()
+    self.gameObject:SetActive(false)
+end
+
+
+function PageScreen:ObjectOnRecycle()
+    self.screenMode:ObjectRecycle()
+    self.screenMode = nil
+    self.screenTop:ObjectRecycle()
+    self.screenTop = nil
+    self.screenWidth:ObjectRecycle()
+    self.screenWidth = nil
+    self.screenHeight:ObjectRecycle()
+    self.screenHeight = nil
+    self.screenAutoFit:ObjectRecycle()
+    self.screenAutoFit = nil
+    self.screenSaveConfirm:ObjectRecycle()
+    self.screenSaveConfirm = nil
+end
+
+function PageScreen:FocusStateEnter()
+    self.gameObject:SetActive(true)
+    self:Refresh()
+end
+
+function PageScreen:FocusStateExit()
+    self.gameObject:SetActive(false)
+    -- self:Recycle()
+end
+
+
+function PageScreen:Refresh()
+    self.screenMode:Refresh("显示设置页面", "屏幕模式", self.screenManager.data.mode, function(mode)
+        self.screenManager.data.mode = mode
+    end
+)
+    self.screenTop:Refresh("显示设置页面/屏幕顶置", self.screenManager.data.isTop, function(bit)
+        self.screenManager.data.isTop = bit
+    end
+)
+    self.screenWidth:Refresh("显示设置页面/屏幕宽度", self.screenManager.data.width, 100, 10000,
+        function(width)
+            self.screenManager.data.width = width
+        end
+)
+    self.screenHeight:Refresh("显示设置页面/屏幕高度", self.screenManager.data.height, 100, 10000,
+        function(height)
+            self.screenManager.data.height = height
+        end
+)
+    self.screenAutoFit:Refresh("显示设置页面/比例计算", function()
+        self.screenManager:ScreenAutoFit()
+        self.screenWidth.inputField.text = self.screenManager.data.width
+        self.screenHeight.inputField.text = self.screenManager.data.height
+    end
+)
+    self.screenSaveConfirm:Refresh("显示设置页面/保存屏幕设置", function()
+        self.screenManager:Refresh()
+
+        if WindowManager.Instance().IsDone then
+            local windowClock = WindowClock.Get()
+            windowClock:Refresh(self.languageManager.Data:Get("提示/保存设置确认") or "", 10, function(bit)
+                if bit then
+                    ControlGameSet.SaveScreen()
+                else
+                    self.screenManager:RestoreData()
+                    self:Refresh()
+                end
+            end
+)
+            WindowManager.Instance():Show(windowClock.window)
+        end
+    end
+)
+end
+
+
+function PageScreen:Recycle()
+ 
+end
+

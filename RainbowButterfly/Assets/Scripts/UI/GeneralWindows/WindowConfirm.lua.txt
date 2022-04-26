@@ -1,0 +1,131 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/08 17:39:29
+
+ * 最后日期: 2022/02/08 17:40:05
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaMonoObjectPoolBuilder"
+using "LuaWindowBuilder"
+
+-- Mono对象池对象
+WindowConfirm = LuaMonoObjectItem:Extend({TableName = "WindowConfirm"})
+WindowConfirm.pool =
+    LuaMonoObjectPoolBuilder.Construct(
+    WindowConfirm,
+    GlobalAsset:Get(CD.ABpfb_ui, CD.AB_WindowConfirm, typeof(GameObject):ToString())
+)
+-- 设置对象池
+WindowConfirm.pool.objectDestoryClock = 600
+WindowConfirm.pool.objectLimit = 1
+
+-- 获取对象，并设置父物体
+function WindowConfirm.Get(parent)
+    return WindowConfirm.pool:GetTable(parent)
+end
+
+-- 获取对象
+function WindowConfirm.Get()
+    return WindowConfirm.pool:GetTable()
+end
+
+function WindowConfirm:ObjectOnNew()
+    self.window = LuaWindowBuilder.Construct(self)
+    self.languageManager = LanguageManager.Instance()
+    self.inputKeysManager = InputKeysManager.Instance()
+
+    local gameObject = self.gameObject
+    self.canvasGroup = gameObject:SetComponent(typeof(CanvasGroup))
+    self.canvasGroup.alpha = 0
+    self.canvasGroup.interactable = false
+
+    self.text = gameObject:SetComponent(typeof(Text), "Text")
+
+    self.confirmBtn = gameObject:SetComponent(typeof(Button), "ConfirmBtn")
+    self.cancelBtn = gameObject:SetComponent(typeof(Button), "CancelBtn")
+
+    self.confirmBtnText = gameObject:SetComponent(typeof(Text), "ConfirmBtnText")
+    self.cancelBtnText = gameObject:SetComponent(typeof(Text), "CancelBtnText")
+
+    self.ConfirmBtn = function()
+        WindowManager.Instance():Close(self.window)
+        if self.callBack then
+            self.callBack(true)
+        end
+    end
+
+    self.CancelBtn = function()
+        WindowManager.Instance():Close(self.window)
+        if self.callBack then
+            self.callBack(false)
+        end
+    end
+
+    self.confirmBtn.onClick:AddListener(self.ConfirmBtn)
+    self.cancelBtn.onClick:AddListener(self.CancelBtn)
+end
+
+function WindowConfirm:ObjectOnDestroy()
+    self.confirmBtn.onClick:RemoveAllListeners()
+    self.cancelBtn.onClick:RemoveAllListeners()
+end
+
+function WindowConfirm:ObjectOnGet()
+    local transform = self.transform
+    transform:SetParent(CanvasServer.Instance():GetLayer(CD.Layer3, ""))
+    transform:GetRectTransform():RectAllStretch()
+    transform:Default()
+end
+
+function WindowConfirm:ObjectOnRecycle()
+end
+
+function WindowConfirm:WaitFocusStateEnter(EnterDone)
+    self.confirmBtnText.text =
+        (self.languageManager.Data:Get("界面快捷键/确认") or "") .. self.inputKeysManager:GetKeyCodes("界面快捷键", "确认"):ToString()
+    self.cancelBtnText.text =
+        (self.languageManager.Data:Get("界面快捷键/取消") or "") .. self.inputKeysManager:GetKeyCodes("界面快捷键", "取消"):ToString()
+
+    self.canvasGroup:DOFade(1, CD.WindowFadeSpeed):SetUpdate(true):OnComplete(
+        function()
+            EnterDone()
+            self.canvasGroup.interactable = true
+        end
+    )
+end
+function WindowConfirm:WaitFocusStateExit(ExitDone)
+    self.canvasGroup.interactable = false
+    self.canvasGroup:DOFade(0, CD.WindowFadeSpeed):SetUpdate(true):OnComplete(
+        function()
+            ExitDone()
+        end
+    )
+end
+function WindowConfirm:FocusStateEnter()
+    EventSystem.current:SetSelectedGameObject(self.cancelBtn.gameObject)
+    --设置初始选中物体
+end
+function WindowConfirm:FocusStateExit()
+    self:ObjectRecycle()
+end
+
+function WindowConfirm:FocusStateUpdate()
+    if self.inputKeysManager:GetKeysDown("界面快捷键", "确认") then
+        self.ConfirmBtn()
+    end
+
+    if self.inputKeysManager:GetKeysDown("界面快捷键", "取消") then
+        self.CancelBtn()
+    end
+end
+
+function WindowConfirm:Refresh(textStr, callBack)
+    self.text.text = textStr
+    self.callBack = callBack
+end

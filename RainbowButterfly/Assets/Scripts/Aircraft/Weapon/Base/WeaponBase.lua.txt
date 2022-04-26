@@ -1,0 +1,89 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/17 21:50:12
+
+ * 最后日期: 2022/03/15 23:09:35
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaMonoObjectPoolBuilder"
+
+---@class WeaponBase 武器基类
+---@field aircraft object 装备的飞船
+---@field bulletGet function 子弹获取委托
+---@field preheat float 射击预热时间（秒）
+---@field interval float 射击间隔时间（秒）
+---@field multiple Int 多重弹头
+---@field diffusion float 扩散角度
+---@field damage float 子弹伤害
+---@field speed float 子弹飞行速度
+---@field range float 射程
+---@field Fire function 开火
+---@field CeaseFire function 停火
+---@field private isFire boolean 开火标记
+---@field private isPreheat boolean 预热标记
+WeaponBase = LuaMonoObjectItem:Extend({
+    TableName = "WeaponBase",
+
+    aircraft = nil, -- 挂载飞船
+
+    isFire = false, -- 开火标记
+    isPreheat = false, -- 预热标记
+
+    bulletGet = nil, -- 子弹获取委托
+
+    targetPosition = Vector3.zero, -- 瞄准目标
+    rotateSpeed = 0, -- 旋转速度
+    rotateRange = 0, -- 旋转范围
+
+    preheat = 0, -- 预热时间
+
+    interval = 0, -- 射击间隔
+    multiple = 1, -- 多重
+    diffusion = 0, -- 扩散角度
+
+    damage = 0, -- 子弹伤害
+    speed = 0, -- 子弹速度
+    range = 200 -- 射程
+})
+
+function WeaponBase:Fire() self.isFire = true end
+
+function WeaponBase:CeaseFire() self.isFire = false end
+
+function WeaponBase:SetPosition(localPosition, localEulerAngles)
+    self.transform.localPosition = localPosition
+    self.transform.localEulerAngles = localEulerAngles
+end
+
+function WeaponBase:MonoUpdate()
+
+    if self.rotateRange > 0 then
+        local targetVector = self.transform.parent:InverseTransformPoint(
+                                 self.targetPosition)
+
+        local targetAngle = Mathf.Atan2(targetVector.x, targetVector.y) *
+                                -Mathf.Rad2Deg
+
+        local rotateAngle = Mathf.MoveTowardsAngle(self.transform
+                                                       .localEulerAngles.z,
+                                                   targetAngle,
+                                                   self.rotateSpeed *
+                                                       Time.deltaTime)
+
+        local AngleRange = self.rotateRange * 0.5
+
+        if rotateAngle >= 180 then rotateAngle = rotateAngle - 360 end
+
+        rotateAngle = Mathf.Clamp(rotateAngle, -AngleRange, AngleRange)
+
+        self.transform.localEulerAngles = Vector3(0, 0, rotateAngle)
+    end
+
+end
+

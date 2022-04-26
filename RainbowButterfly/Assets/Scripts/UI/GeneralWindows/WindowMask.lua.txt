@@ -1,0 +1,57 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/11 18:22:07
+
+ * 最后日期: 2022/02/11 18:22:46
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaMonoObjectPoolBuilder"
+using "LuaMonoSingletonItem"
+
+-- Mono对象池对象
+WindowMask = LuaMonoSingletonItem:Extend({TableName = "WindowMask"})
+WindowMask.pool =
+    LuaMonoObjectPoolBuilder.Construct(
+    WindowMask,
+    GlobalAsset:Get(CD.ABpfb_ui, CD.AB_WindowMask, typeof(GameObject):ToString())
+)
+WindowMask.pool.objectDestoryClock = 600
+
+-- 获取对象
+function WindowMask.Get()
+    return WindowMask.pool:GetTable()
+end
+
+-- 获取对象，并设置父物体
+function WindowMask.Get(parent)
+    return WindowMask.pool:GetTable(parent)
+end
+function WindowMask.Show()
+    WindowMask:Instance().mono.gameObject:SetActive(true)
+end
+function WindowMask.Close()
+    WindowMask:Instance().mono.gameObject:SetActive(false)
+end
+function WindowMask:ObjectOnNew()
+    
+end
+
+function WindowMask:ObjectOnDestroy()
+end
+
+function WindowMask:ObjectOnGet()
+    self.transform:SetParent(CanvasServer.Instance():GetLayer(CD.Layer5, ""))
+    self.transform:Default():GetRectTransform():RectAllStretch()
+end
+
+function WindowMask:ObjectOnRecycle()
+end
+
+function WindowMask:MonoUpdate()
+end

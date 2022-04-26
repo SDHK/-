@@ -1,0 +1,58 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/03/09 21:17:46
+
+ * 最后日期: 2022/03/10 21:18:32
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaObjectPoolBuilder"
+
+ControlBase = LuaObjectItem:Extend({TableName = "ControlBase"})
+
+function ControlBase:ObjectOnNew()
+    self.focusState = LuaFocusStateBuilder.Construct(self)
+end
+function ControlBase:ObjectOnDestroy()
+    self.focusState = nil
+end
+function ControlBase:ObjectOnGet()
+    self.strategyMachine = FocusStateMachine.Get()
+    self.weaponStrategyMachine = FocusStateMachine.Get()
+end
+
+function ControlBase:ObjectOnRecycle()
+    self.strategyMachine:ObjectRecycle()
+    self.weaponStrategyMachine:ObjectRecycle()
+    self.strategyMachine = nil
+    self.weaponStrategyMachine = nil
+    self.aircraft = nil
+end
+
+function ControlBase:SetAircraft(aircraft)
+    self.aircraft = aircraft
+    return self
+end
+function ControlBase:SetStrategy(strategy)
+    if strategy then
+        strategy:SetControl(self)
+        self.strategyMachine:Set(strategy.focusState)
+    else
+        self.strategyMachine:Set(nil)
+    end
+    return self
+end
+function ControlBase:SetWeaponStrategy(strategy)
+    if strategy then
+        strategy:SetControl(self)
+        self.weaponStrategyMachine:Set(strategy.focusState)
+    else
+        self.weaponStrategyMachine:Set(nil)
+    end
+    return self
+end

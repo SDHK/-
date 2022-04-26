@@ -1,0 +1,72 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/03/10 22:15:28
+
+ * 最后日期: 2022/03/10 22:15:47
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaObjectPoolBuilder"
+
+Script "StrategyBase"
+
+-- 对象池对象
+StrategyImpact = StrategyBase:Extend({
+    TableName = "StrategyImpact"
+})
+StrategyImpact.pool = LuaObjectPoolBuilder.Construct(StrategyImpact)
+
+-- 获取对象
+function StrategyImpact.Get()
+    return StrategyImpact.pool:Get()
+end
+
+
+function StrategyImpact:ObjectOnNew()
+    self.focusState = LuaFocusStateBuilder.Construct(self)
+end
+
+
+function StrategyImpact:ObjectOnDestroy()
+    self.focusState = nil
+end
+
+
+function StrategyImpact:ObjectOnGet()
+    self.control = nil
+    self.target = nil
+
+end
+
+
+function StrategyImpact:ObjectOnRecycle()
+end
+
+
+function StrategyImpact:FocusStateEnter()
+end
+
+
+function StrategyImpact:FocusStateUpdate()
+
+    if self.control.aircraft then
+        if IsNull(self.target) then
+            self.target = LayerPool:Instance():GetRecentRelation(self.control.aircraft, "Aircraft").transform
+        else
+            self.control.aircraft.movePosition = self.target.position
+        end
+    end
+
+end
+
+
+function StrategyImpact:FocusStateExit()
+    self:ObjectRecycle()
+end
+
+

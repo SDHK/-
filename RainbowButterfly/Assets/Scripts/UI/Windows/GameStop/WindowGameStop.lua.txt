@@ -1,0 +1,136 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/03/08 11:16:50
+
+ * 最后日期: 2022/03/08 11:20:07
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaMonoObjectPoolBuilder"
+using 'LuaMonoSingletonItem'
+
+Script "ControlGameSet"
+
+-- Mono对象池对象
+WindowGameStop = LuaMonoSingletonItem:Extend({
+    TableName = "WindowGameStop"
+})
+WindowGameStop.pool = LuaMonoObjectPoolBuilder.Construct(WindowGameStop, GlobalAsset:Get(CD.ABpfb_ui,
+    CD.AB_WindowGameStop, typeof(GameObject):ToString()))
+
+WindowGameStop.pool.objectDestoryClock = 600
+WindowGameStop.pool.objectLimit = 1
+
+-- 获取对象
+function WindowGameStop.Get()
+    return WindowGameStop.pool:GetTable()
+end
+
+
+-- 获取对象，并设置父物体
+function WindowGameStop.Get(parent)
+    return WindowGameStop.pool:GetTable(parent)
+end
+
+
+function WindowGameStop:ObjectOnNew()
+    self.window = LuaWindowBuilder.Construct(self)
+    self.inputKeysManager = InputKeysManager.Instance()
+
+    local gameObject = self.gameObject
+
+    self.canvasGroup = gameObject:SetComponent(typeof(CanvasGroup))
+    self.canvasGroup.alpha = 0
+    self.canvasGroup.interactable = false
+
+    self.returnBtn = gameObject:SetComponent(typeof(Button), "ReturnBtn")
+    self.setBtn = gameObject:SetComponent(typeof(Button), "SetBtn")
+    self.returnMainBtn = gameObject:SetComponent(typeof(Button), "ReturnMainBtn")
+
+    self.returnBtn.gameObject:SetComponent(typeof(LanguageText), "Text"):SetPath("暂停界面/返回游戏")
+    self.setBtn.gameObject:SetComponent(typeof(LanguageText), "Text"):SetPath("暂停界面/游戏设置")
+    self.returnMainBtn.gameObject:SetComponent(typeof(LanguageText), "Text"):SetPath("暂停界面/返回主界面")
+
+--     self.setBtn.onClick:AddListener(function()
+--         ControlGameSet:Instance():Show()
+--         -- WindowManager.Instance():Show(WindowGameSet.Get().window)
+--     end
+-- )
+
+--     self.returnBtn.onClick:AddListener(function()
+--         WindowManager.Instance():Close(self.window)
+--     end
+-- )
+--     self.returnMainBtn.onClick:AddListener(function()
+--         GlobalAsset:Get("游戏流程状态机"):Set(StateMainMenu:Instance().focusState)
+--     end
+-- )
+end
+
+
+function WindowGameStop:ObjectOnDestroy()
+
+end
+
+
+function WindowGameStop:ObjectOnGet()
+    local transform = self.transform
+    transform:SetParent(CanvasServer.Instance():GetLayer(CD.Layer1, ""))
+    transform:GetRectTransform():RectAllStretch()
+    transform:Default()
+end
+
+
+function WindowGameStop:ObjectOnRecycle()
+end
+
+
+function WindowGameStop:WaitFocusStateEnter(EnterDone)
+    self.gameObject:SetActive(true)
+    self.canvasGroup:DOFade(1, CD.WindowFadeSpeed):SetUpdate(true):OnComplete(function()
+        EnterDone()
+        self.canvasGroup.interactable = true
+    end
+)
+end
+
+
+function WindowGameStop:WaitFocusStateExit(ExitDone)
+    self.canvasGroup.interactable = false
+    self.canvasGroup:DOFade(0, CD.WindowFadeSpeed):SetUpdate(true):OnComplete(function()
+        ExitDone()
+    end
+)
+end
+
+function WindowGameStop:FocusStateEnter()
+    EventSystem.current:SetSelectedGameObject(self.returnBtn.gameObject)
+    -- 设置初始选中物体
+end
+
+function WindowGameStop:FocusStateExit()
+    self.gameObject:SetActive(false)
+end
+function WindowGameStop:FocusStateUpdate()
+    if self.inputKeysManager:GetKeysDown("界面快捷键", "返回") then
+        WindowManager.Instance():Close(self.window)
+    end
+end
+
+
+function WindowGameStop:StackStateEnter()
+    Time.timeScale = 0
+end
+
+
+function WindowGameStop:StackStateExit()
+    Time.timeScale = 1
+    -- self:ObjectRecycle()
+end
+
+

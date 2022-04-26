@@ -1,0 +1,520 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/03/08 09:12:28
+
+ * 最后日期: 2022/03/08 09:14:25
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaObjectPoolBuilder"
+using "LuaFocusStateBuilder"
+
+Script "ControlGameOver"
+Script "ControlDefault"
+Script "StrategyImpact"
+Script "StrategyOrbit"
+Script "StrategyIntervalShot"
+
+-- 对象池对象
+Level1 = LuaObjectItem:Extend({TableName = "Level1"})
+Level1.pool = LuaObjectPoolBuilder.Construct(Level1)
+
+-- 获取对象
+function Level1.Get() return Level1.pool:Get() end
+
+function Level1:ObjectOnNew()
+    self.focusState = LuaFocusStateBuilder.Construct(self)
+end
+
+function Level1:ObjectOnDestroy() self.focusState = nil end
+
+function Level1:ObjectOnGet() end
+
+function Level1:ObjectOnRecycle() end
+
+function Level1:FocusStateEnter()
+    print("Level1进入！")
+    local layerPool = LayerPool:Instance()
+    local enemyList = layerPool:GetLayerPool("Enemy")
+    -- local player = layerPool:GetLayerPool("Player")[0]
+
+    local interval = Mathf.PI * 2
+
+    self.eventExecutor = EventExecutor.Get():RunUpdate():Action(function(e0)
+        ControlGame:Instance():Level("0")
+
+        e0:WaitUpdate():Action(function()
+          
+
+            for i = 1, 10, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 20
+                strategy.timeOffset = i * (interval / 25)
+                AircraftFixedWing.GetEnemyChase():GetControl():SetStrategy(
+                    strategy)
+            end
+
+        end):Loop(function(ex0)
+            if enemyList.Count < 5 then ex0.current:Done() end
+        end):Action(function()
+            for i = 1, 5, 1 do
+                AircraftFixedWing.GetEnemyChase():GetControl():SetStrategy(
+                    StrategyImpact.Get())
+            end
+        end)
+
+    end):Loop(function(ex0)
+        if enemyList.Count <= 10 then ex0.current:Done() end
+    end):Action(function(e0)
+        ControlGame:Instance():Level("1")
+
+        e0:WaitUpdate():Action(function()
+
+            for i = 1, 25, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 20
+                strategy.timeOffset = i * (interval / 50)
+                AircraftFixedWing.GetEnemyChase():GetControl():SetStrategy(
+                    strategy)
+            end
+
+        end):Loop(function(ex0)
+            if enemyList.Count < 5 then ex0.current:Done() end
+        end):Action(function()
+            for i = 1, 25, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 30
+
+                strategy.timeSpeed = -1
+                strategy.timeOffset = i * (interval / 50)
+                AircraftFixedWing.GetEnemyChase():GetControl():SetStrategy(
+                    strategy)
+            end
+        end):Loop(function(ex0)
+            if enemyList.Count < 20 then ex0.current:Done() end
+        end):Action(function()
+
+            for i = 1, 20, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 40
+                strategy.timeSpeed = -0.5
+                strategy.timeSpeedX = -2.5
+                strategy.timeOffset = i * (interval / 50)
+
+                local strategyWeapon = StrategyIntervalShot.Get()
+                strategyWeapon.timeOffset = i * interval * 2
+                strategyWeapon.intervalTime = 10
+                strategyWeapon.ShotTime = 1
+
+                local control = AircraftFixedWing.GetEnemyGunner():GetControl()
+                control:SetStrategy(strategy)
+                control:SetWeaponStrategy(strategyWeapon)
+            end
+        end)
+
+    end):Loop(function(ex0)
+        if enemyList.Count < 5 then ex0.current:Done() end
+    end):Action(function(e0)
+        ControlGame:Instance():Level("2")
+
+        e0:WaitUpdate():Action(function()
+            for i = 1, 25, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 30
+
+                strategy.timeSpeed = -1
+                strategy.timeSpeedX = 0.5
+                strategy.timeOffset = i * (interval / 50)
+                AircraftFixedWing.GetEnemyChase():GetControl():SetStrategy(
+                    strategy)
+            end
+
+        end):Loop(function(ex0)
+            if enemyList.Count < 20 then ex0.current:Done() end
+        end):Action(function()
+            for i = 1, 20, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 30
+                strategy.timeSpeed = -1.5
+                strategy.timeSpeedX = -2.5
+                strategy.timeOffset = i * (interval / 50)
+
+                local strategyWeapon = StrategyIntervalShot.Get()
+                strategyWeapon.timeOffset = i * interval * 2
+                strategyWeapon.intervalTime = 10
+                strategyWeapon.ShotTime = 1
+
+                local control = AircraftFixedWing.GetEnemyGunner():GetControl()
+                control:SetStrategy(strategy)
+                control:SetWeaponStrategy(strategyWeapon)
+            end
+        end):Loop(function(ex0)
+            if enemyList.Count < 20 then ex0.current:Done() end
+        end):Action(function()
+
+            for i = 1, 5, 1 do
+                AircraftFixedWing.GetEnemyChase():GetControl():SetStrategy(
+                    StrategyImpact.Get())
+            end
+        end)
+
+    end):Loop(function(ex0)
+        if enemyList.Count < 5 then ex0.current:Done() end
+    end):Action(function(e0)
+        ControlGame:Instance():Level("3")
+
+        e0:WaitUpdate():Action(function()
+            for i = 1, 50, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 30
+
+                strategy.timeSpeed = -1
+                strategy.timeSpeedX = 2
+                strategy.timeOffset = i * (interval / 50)
+                AircraftFixedWing.GetEnemyChase():GetControl():SetStrategy(
+                    strategy)
+            end
+
+        end):Loop(function(ex0)
+            if enemyList.Count < 20 then ex0.current:Done() end
+        end):Action(function()
+            for i = 1, 50, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 40
+                strategy.timeSpeed = 1
+                strategy.timeSpeedX = 2
+                strategy.timeOffset = i * (interval / 50)
+
+                local strategyWeapon = StrategyIntervalShot.Get()
+                strategyWeapon.timeOffset = i * interval * 2
+                strategyWeapon.intervalTime = 10
+                strategyWeapon.ShotTime = 1
+
+                local control = AircraftFixedWing.GetEnemyGunner():GetControl()
+                control:SetStrategy(strategy)
+                control:SetWeaponStrategy(strategyWeapon)
+            end
+        end):Loop(function(ex0)
+            if enemyList.Count < 20 then ex0.current:Done() end
+        end):Action(function()
+
+            for i = 1, 5, 1 do
+                AircraftFixedWing.GetEnemyChase():GetControl():SetStrategy(
+                    StrategyImpact.Get())
+            end
+        end)
+
+    end):Loop(function(ex0)
+        if enemyList.Count < 5 then ex0.current:Done() end
+    end):Action(function(e0)
+        ControlGame:Instance():Level("4")
+
+        e0:WaitUpdate():Action(function()
+            for i = 1, 40, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 30
+
+                strategy.timeSpeedX = 1.5
+                strategy.timeSpeedY = -0.5
+
+                strategy.timeOffset = i * (interval / 50)
+                AircraftFixedWing.GetEnemyChase():GetControl():SetStrategy(
+                    strategy)
+            end
+
+        end):Loop(function(ex0)
+            if enemyList.Count < 30 then ex0.current:Done() end
+        end):Action(function()
+            for i = 1, 50, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 40
+                strategy.timeSpeed = 0.5
+                strategy.timeSpeedX = 2
+                strategy.timeOffset = i * (interval / 50)
+
+                local strategyWeapon = StrategyIntervalShot.Get()
+                strategyWeapon.timeOffset = i * interval * 2
+                strategyWeapon.intervalTime = 10
+                strategyWeapon.ShotTime = 1
+
+                local control = AircraftFixedWing.GetEnemyGunner():GetControl()
+                control:SetStrategy(strategy)
+                control:SetWeaponStrategy(strategyWeapon)
+            end
+        end):Loop(function(ex0)
+            if enemyList.Count < 40 then ex0.current:Done() end
+        end):Action(function()
+
+            for i = 1, 50, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 30
+
+                strategy.timeSpeedX = 0.5
+                strategy.timeSpeedY = -1.5
+
+                strategy.timeOffset = i * (interval / 50)
+                AircraftFixedWing.GetEnemyChase():GetControl():SetStrategy(
+                    strategy)
+            end
+        end)
+
+    end):Loop(function(ex0)
+        if enemyList.Count < 10 then ex0.current:Done() end
+    end):Action(function(e0)
+        ControlGame:Instance():Level("5")
+
+        e0:WaitUpdate():Action(function()
+            for i = 1, 50, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 30
+
+                strategy.timeSpeedX = 0.5
+                strategy.timeSpeedY = -0.5
+
+                strategy.timeOffset = i * (interval / 50)
+                AircraftFixedWing.GetEnemyChase():GetControl():SetStrategy(
+                    strategy)
+            end
+
+            for i = 1, 50, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 40
+
+                strategy.timeSpeedX = 0.5
+                strategy.timeSpeedY = -1.5
+
+                strategy.timeOffset = i * (interval / 50)
+                AircraftFixedWing.GetEnemyChase():GetControl():SetStrategy(
+                    strategy)
+            end
+
+        end):Loop(function(ex0)
+            if enemyList.Count < 40 then ex0.current:Done() end
+        end):Action(function()
+            for i = 1, 50, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 40
+                strategy.timeSpeed = 0.5
+                strategy.timeSpeedX = 2
+                strategy.timeOffset = i * (interval / 50)
+
+                local strategyWeapon = StrategyIntervalShot.Get()
+                strategyWeapon.timeOffset = i * interval * 2
+                strategyWeapon.intervalTime = 10
+                strategyWeapon.ShotTime = 1
+
+                local control = AircraftFixedWing.GetEnemyGunner():GetControl()
+                control:SetStrategy(strategy)
+                control:SetWeaponStrategy(strategyWeapon)
+            end
+
+            for i = 1, 50, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 40
+                strategy.timeSpeed = 2
+                strategy.timeSpeedX = 1.5
+                strategy.timeOffset = i * (interval / 50)
+
+                local strategyWeapon = StrategyIntervalShot.Get()
+                strategyWeapon.timeOffset = i * interval * 2
+                strategyWeapon.intervalTime = 10
+                strategyWeapon.ShotTime = 1
+
+                local control = AircraftFixedWing.GetEnemyGunner():GetControl()
+                control:SetStrategy(strategy)
+                control:SetWeaponStrategy(strategyWeapon)
+            end
+
+        end):Loop(function(ex0)
+            if enemyList.Count < 50 then ex0.current:Done() end
+        end):Action(function()
+
+            for i = 1, 50, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 50
+
+                strategy.timeSpeedX = 0.5
+                strategy.timeSpeedY = -1.5
+
+                strategy.timeOffset = i * (interval / 50)
+                AircraftFixedWing.GetEnemyChase():GetControl():SetStrategy(
+                    strategy)
+            end
+
+            
+            for i = 1, 4, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 50
+                strategy.timeSpeed = 1
+                strategy.timeOffset = i * (interval / 4)
+
+                local strategyWeapon = StrategyIntervalShot.Get()
+                strategyWeapon.timeOffset = i * (interval / 4)
+                strategyWeapon.intervalTime = 10
+                strategyWeapon.ShotTime = 1
+
+                local control = AircraftFixedWing.GetEnemyLaser():GetControl()
+                control:SetStrategy(strategy)
+                control:SetWeaponStrategy(strategyWeapon)
+            end
+        end)
+
+    end):Loop(function(ex0)
+        if enemyList.Count < 10 then ex0.current:Done() end
+    end):Action(function(e0)
+        ControlGame:Instance():Level("6")
+
+        e0:WaitUpdate():Action(function()
+            for i = 1, 50, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 20
+
+                strategy.timeSpeedX = 0.5
+                strategy.timeSpeedY = -1.5
+
+                strategy.timeOffset = i * (interval / 50)
+                AircraftFixedWing.GetEnemyChase():GetControl():SetStrategy(
+                    strategy)
+            end
+
+            for i = 1, 50, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 30
+                strategy.timeSpeed = 1.5
+                strategy.timeSpeedX = 2
+                strategy.timeOffset = i * (interval / 50)
+
+                local strategyWeapon = StrategyIntervalShot.Get()
+                strategyWeapon.timeOffset = i * interval * 2
+                strategyWeapon.intervalTime = 10
+                strategyWeapon.ShotTime = 1
+
+                local control = AircraftFixedWing.GetEnemyGunner():GetControl()
+                control:SetStrategy(strategy)
+                control:SetWeaponStrategy(strategyWeapon)
+            end
+
+            for i = 1, 50, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 40
+
+                strategy.timeSpeedX = 0.5
+                strategy.timeSpeedY = -1.5
+
+                strategy.timeOffset = i * (interval / 50)
+                AircraftFixedWing.GetEnemyChase():GetControl():SetStrategy(
+                    strategy)
+            end
+
+        end):Loop(function(ex0)
+            if enemyList.Count < 60 then ex0.current:Done() end
+        end):Action(function()
+            for i = 1, 50, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 40
+                strategy.timeSpeedX = 1
+                strategy.timeSpeedY = -1.5
+                strategy.timeOffset = i * (interval / 50)
+
+                local strategyWeapon = StrategyIntervalShot.Get()
+                strategyWeapon.timeOffset = i * interval * 2
+                strategyWeapon.intervalTime = 10
+                strategyWeapon.ShotTime = 1
+
+                local control = AircraftFixedWing.GetEnemyGunner():GetControl()
+                control:SetStrategy(strategy)
+                control:SetWeaponStrategy(strategyWeapon)
+            end
+
+            for i = 1, 50, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 40
+                strategy.timeSpeed = -2
+                strategy.timeSpeedX = 1.5
+                strategy.timeOffset = i * (interval / 50)
+
+                local strategyWeapon = StrategyIntervalShot.Get()
+                strategyWeapon.timeOffset = i * interval * 2
+                strategyWeapon.intervalTime = 10
+                strategyWeapon.ShotTime = 1
+
+                local control = AircraftFixedWing.GetEnemyGunner():GetControl()
+                control:SetStrategy(strategy)
+                control:SetWeaponStrategy(strategyWeapon)
+            end
+
+
+        end):Loop(function(ex0)
+            if enemyList.Count < 50 then ex0.current:Done() end
+        end):Action(function()
+
+            for i = 1, 50, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 40
+
+                strategy.timeSpeedX = 0.5
+                strategy.timeSpeedY = -1.5
+
+                strategy.timeOffset = i * (interval / 50)
+                AircraftFixedWing.GetEnemyChase():GetControl():SetStrategy(
+                    strategy)
+            end
+
+            for i = 1, 50, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 50
+                strategy.timeSpeedX = 2.5
+                strategy.timeSpeedY = -1.5
+                strategy.timeOffset = i * (interval / 50)
+
+                local strategyWeapon = StrategyIntervalShot.Get()
+                strategyWeapon.timeOffset = i * interval * 2
+                strategyWeapon.intervalTime = 10
+                strategyWeapon.ShotTime = 1
+
+                local control = AircraftFixedWing.GetEnemyGunner():GetControl()
+                control:SetStrategy(strategy)
+                control:SetWeaponStrategy(strategyWeapon)
+            end
+
+
+            for i = 1, 20, 1 do
+                local strategy = StrategyOrbit.Get()
+                strategy.radius = 50
+                strategy.timeSpeed = 1
+                strategy.timeOffset = i * (interval / 20)
+
+                local strategyWeapon = StrategyIntervalShot.Get()
+                strategyWeapon.timeOffset = i * (interval / 20)
+                strategyWeapon.intervalTime = 10
+                strategyWeapon.ShotTime = 1
+
+                local control = AircraftFixedWing.GetEnemyLaser():GetControl()
+                control:SetStrategy(strategy)
+                control:SetWeaponStrategy(strategyWeapon)
+            end
+        end)
+
+    end):Loop(function(ex0)
+        if enemyList.Count == 0 then ex0.current:Done() end
+    end):Action(function()
+        print("卡关1结束")
+
+        ControlGameOver:Instance():SetTitle("游戏通关")
+        ControlGameOver:Instance():Show()
+    end)
+end
+
+function Level1:FocusStateExit()
+    print("Level1退出！")
+    self.eventExecutor:ObjectRecycle()
+    self:ObjectRecycle()
+end
+
+function Level1:FocusStateUpdate() end
+

@@ -1,0 +1,118 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/05 17:33:33
+
+ * 最后日期: 2022/02/06 13:50:34
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaMonoObjectPoolBuilder"
+using "LuaMonoSingletonItem"
+using "LuaWindowBuilder"
+
+
+Script "WindowGameSet"
+Script "WindowConfirm"
+
+-- Mono对象池对象
+WindowMain = LuaMonoSingletonItem:Extend({
+    TableName = "WindowMain"
+})
+WindowMain.pool = LuaMonoObjectPoolBuilder.Construct(WindowMain, GlobalAsset:Get(CD.ABpfb_ui, CD.AB_WindowMain,
+    typeof(GameObject):ToString()))
+-- 设置对象池
+-- WindowMain.pool.objectDestoryClock = 600
+WindowMain.pool.objectLimit = 1
+
+-- 获取对象，并设置父物体
+function WindowMain.Get(parent)
+    return WindowMain.pool:GetTable(parent)
+end
+
+
+-- 获取对象
+function WindowMain.Get()
+    return WindowMain.pool:GetTable()
+end
+
+
+function WindowMain:ObjectOnNew()
+    self.window = LuaWindowBuilder.Construct(self)
+    self.inputKeysManager = InputKeysManager.Instance()
+
+    local gameObject = self.gameObject
+
+    self.canvasGroup = gameObject:SetComponent(typeof(CanvasGroup))
+    self.canvasGroup.alpha = 0
+    self.canvasGroup.interactable = false
+
+    self.startBtn = gameObject:SetComponent(typeof(Button), "StartBtn")
+    self.setBtn = gameObject:SetComponent(typeof(Button), "SetBtn")
+
+    self.gameName = gameObject:SetComponent(typeof(LanguageText), "GameName"):SetPath("主界面/游戏名字")
+    self.startBtnText = gameObject:SetComponent(typeof(LanguageText), "StartBtnText"):SetPath("主界面/开始")
+    self.setBtnText = gameObject:SetComponent(typeof(LanguageText), "SetBtnText"):SetPath("主界面/设置")
+
+    self.quitGame = nil
+end
+
+
+function WindowMain:ObjectOnDestroy()
+
+end
+
+
+function WindowMain:ObjectOnGet()
+    local transform = self.transform
+    transform:SetParent(CanvasServer.Instance():GetLayer(CD.Layer1, ""))
+    transform:GetRectTransform():RectAllStretch()
+    transform:Default()
+end
+
+
+function WindowMain:ObjectOnRecycle()
+
+end
+
+
+function WindowMain:WaitFocusStateEnter(EnterDone)
+    self.gameObject:SetActive(true)
+    self.canvasGroup:DOFade(1, CD.WindowFadeSpeed):SetUpdate(true):OnComplete(function()
+        EnterDone()
+        self.canvasGroup.interactable = true
+    end
+)
+end
+
+
+function WindowMain:WaitFocusStateExit(ExitDone)
+    self.canvasGroup.interactable = false
+    self.canvasGroup:DOFade(0, CD.WindowFadeSpeed):SetUpdate(true):OnComplete(function()
+        ExitDone()
+    end
+)
+end
+
+
+function WindowMain:FocusStateEnter()
+    EventSystem.current:SetSelectedGameObject(self.setBtn.gameObject)
+    -- 设置初始选中物体
+end
+function WindowMain:FocusStateExit()
+    self.gameObject:SetActive(false)
+end
+
+function WindowMain:FocusStateUpdate()
+    if self.inputKeysManager:GetKeysDown("界面快捷键", "返回") then
+        if self.quitGame then
+            self.quitGame()
+        end
+    end
+end
+
+

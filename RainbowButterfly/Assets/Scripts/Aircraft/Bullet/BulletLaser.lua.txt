@@ -1,0 +1,49 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/04/02 09:22:20
+
+ * 最后日期: 2022/04/02 09:22:55
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using 'LuaMonoObjectPoolBuilder'
+Script "BulletBase"
+
+-- Mono对象池对象
+BulletLaser = BulletBase:Extend({TableName = 'BulletLaser'})
+
+function BulletLaser:Hit(bit)
+    self.isHit = bit
+end
+
+
+function BulletLaser:SetWidth(width)
+    self.line.startWidth = width
+    self.line.endWidth = width
+    self.transform.localScale = Vector3(0, self.weapon.range, 0)
+end
+
+function BulletLaser:ObjectOnNew()
+    self.line = self.gameObject:SetComponent(typeof(LineRenderer))
+
+end
+
+function BulletLaser:ObjectOnDestroy() end
+
+function BulletLaser:ObjectOnGet() self.gameObject:SetActive(false) end
+
+function BulletLaser:ObjectOnRecycle() end
+
+function BulletLaser:MonoOnTriggerStay2D(collider2D)
+    if collider2D.gameObject.tag == "Aircraft" and self.isHit then
+        collider2D.gameObject:GetComponent(typeof(LuaMonoObject)).table:Hit(
+            self.weapon.damage)
+        self.isHit = false
+    end
+end
+

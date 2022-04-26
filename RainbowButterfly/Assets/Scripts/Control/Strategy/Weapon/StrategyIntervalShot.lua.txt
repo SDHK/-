@@ -1,0 +1,74 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/03/13 10:34:42
+
+ * 最后日期: 2022/03/21 14:52:56
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaObjectPoolBuilder"
+Script "StrategyBase"
+-- 对象池对象
+StrategyIntervalShot = StrategyBase:Extend({
+    TableName = "StrategyIntervalShot"
+})
+StrategyIntervalShot.pool = LuaObjectPoolBuilder.Construct(StrategyIntervalShot)
+
+-- 获取对象
+function StrategyIntervalShot.Get()
+    return StrategyIntervalShot.pool:Get()
+end
+
+
+function StrategyIntervalShot:ObjectOnNew()
+    self.focusState = LuaFocusStateBuilder.Construct(self)
+end
+
+
+function StrategyIntervalShot:ObjectOnDestroy()
+    self.focusState = nil
+end
+
+
+function StrategyIntervalShot:ObjectOnGet()
+    self.timeOffset = 1
+    self.intervalTime = 1
+    self.ShotTime = 1
+end
+
+
+function StrategyIntervalShot:ObjectOnRecycle()
+end
+
+
+function StrategyIntervalShot:FocusStateEnter()
+end
+
+
+function StrategyIntervalShot:FocusStateUpdate()
+    if self.control.aircraft then
+        if IsNull(self.target) then
+            self.target = LayerPool:Instance():GetRecentRelation(self.control.aircraft, "Aircraft").transform
+        else
+            self.control.aircraft.targetPosition = self.target.position
+
+            if (Time.time + self.timeOffset) % self.intervalTime < self.ShotTime then
+                self.control.aircraft:WeaponsFire(1)
+            else
+                self.control.aircraft:WeaponsCeaseFire(1)
+            end
+
+        end
+    end
+
+end
+
+
+function StrategyIntervalShot:FocusStateExit()
+    self:ObjectRecycle()
+end

@@ -1,0 +1,102 @@
+﻿
+--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/11 21:24:25
+
+ * 最后日期: 2022/03/03 16:56:02
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]]--------------------
+
+--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/11 21:24:25
+
+ * 最后日期: 2022/02/15 17:18:45
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]]--------------------
+using "LuaMonoObjectPoolBuilder"
+
+-- Mono对象池对象
+ScrollListDropdownEnum = LuaMonoObjectItem:Extend({TableName = "ScrollListDropdownEnum"})
+ScrollListDropdownEnum.pool =
+    LuaMonoObjectPoolBuilder.Construct(
+    ScrollListDropdownEnum,
+    GlobalAsset:Get(CD.ABpfb_ui, CD.AB_ScrollListDropdown, typeof(GameObject):ToString())
+)
+ScrollListDropdownEnum.pool.objectDestoryClock = 600
+
+-- 获取对象
+function ScrollListDropdownEnum.Get()
+    return ScrollListDropdownEnum.pool:GetTable()
+end
+
+-- 获取对象，并设置父物体
+function ScrollListDropdownEnum.Get(parent)
+    return ScrollListDropdownEnum.pool:GetTable(parent)
+end
+
+function ScrollListDropdownEnum:ObjectOnNew()
+    self.languageManager = LanguageManager.Instance()
+    local gameObject = self.gameObject
+    self.languageText = gameObject:SetComponent(typeof(LanguageText), "LanguageText")
+
+    self.dropdown = gameObject:SetComponent(typeof(Dropdown), "Dropdown")
+
+    self.DropdownCallBack = function(index)
+        if self.CallBack then
+            self.CallBack(self.enumArray:GetValue(index))
+        end
+    end
+    self.dropdown.onValueChanged:AddListener(self.DropdownCallBack)
+end
+
+function ScrollListDropdownEnum:ObjectOnDestroy()
+    self.dropdown.onValueChanged:RemoveAllListeners()
+end
+
+function ScrollListDropdownEnum:ObjectOnGet()
+    self.transform:Default()
+end
+
+function ScrollListDropdownEnum:ObjectOnRecycle()
+end
+
+function ScrollListDropdownEnum:MonoUpdate()
+end
+
+function ScrollListDropdownEnum:Refresh(group, key, enum_, callback)
+    self.languageText:SetPath(group .. "/" .. key)
+    self.enumArray = Enum.GetValues(enum_:GetType())
+    self.enumNames = Enum.GetNames(enum_:GetType())
+
+    local enums =
+        Activator.CreateInstance(Type.GetType("System.Collections.Generic.List`1[[System.String, mscorlib]],mscorlib"))
+
+    for i = 1, self.enumNames.Length do
+        local str = self.languageManager.Data:Get(group .. "/" .. self.enumNames[i - 1]) or ""
+        enums:Add(str)
+    end
+
+    self.dropdown:ClearOptions()
+    self.dropdown:AddOptions(enums)
+
+    for i = 1, self.enumNames.Length do
+        if self.enumNames[i - 1] == enum_:ToString() then
+            self.dropdown.value = i - 1
+        end
+    end
+
+    self.CallBack = callback
+end

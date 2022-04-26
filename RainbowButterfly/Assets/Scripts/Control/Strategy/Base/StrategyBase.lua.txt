@@ -1,0 +1,33 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/03/10 22:02:11
+
+ * 最后日期: 2022/03/10 22:02:33
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+
+using "LuaObjectPoolBuilder"
+
+-- 对象池对象
+StrategyBase = LuaObjectItem:Extend({TableName = "StrategyBase"})
+StrategyBase.pool = LuaObjectPoolBuilder.Construct(StrategyBase)
+
+-- 获取对象
+function StrategyBase.Get()
+    return StrategyBase.pool:Get()
+end
+function StrategyBase:SetControl(control)
+    self.control = control
+    return self
+end
+function StrategyBase:SetTarget(target)
+    self.target = target
+    return self
+end
+

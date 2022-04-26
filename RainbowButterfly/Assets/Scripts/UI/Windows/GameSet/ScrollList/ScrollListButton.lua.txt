@@ -1,0 +1,76 @@
+﻿
+--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/12 01:22:51
+
+ * 最后日期: 2022/03/03 16:55:55
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]]--------------------
+--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/12 01:22:51
+
+ * 最后日期: 2022/02/12 01:23:24
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+
+using "LuaMonoObjectPoolBuilder"
+
+-- Mono对象池对象
+ScrollListButton = LuaMonoObjectItem:Extend({TableName = "ScrollListButton"})
+ScrollListButton.pool =
+    LuaMonoObjectPoolBuilder.Construct(
+    ScrollListButton,
+    GlobalAsset:Get(CD.ABpfb_ui, CD.AB_ScrollListButton, typeof(GameObject):ToString())
+)
+
+-- 获取对象
+function ScrollListButton.Get()
+    return ScrollListButton.pool:GetTable()
+end
+
+-- 获取对象，并设置父物体
+function ScrollListButton.Get(parent)
+    return ScrollListButton.pool:GetTable(parent)
+end
+
+function ScrollListButton:ObjectOnNew()
+    local gameObject = self.gameObject
+    self.languageText = gameObject:SetComponent(typeof(LanguageText), "LanguageText")
+    self.button = gameObject:SetComponent(typeof(Button), "Button")
+    self.button.onClick:AddListener(
+        function()
+            self.CallBack()
+        end
+    )
+end
+
+function ScrollListButton:ObjectOnDestroy()
+    self.button.onClick:RemoveAllListeners()
+end
+
+
+function ScrollListButton:ObjectOnGet()
+    self.transform:Default()
+
+end
+
+function ScrollListButton:ObjectOnRecycle()
+end
+
+function ScrollListButton:Refresh(languagePath, callback)
+    self.languageText:SetPath(languagePath)
+    self.CallBack = callback
+end

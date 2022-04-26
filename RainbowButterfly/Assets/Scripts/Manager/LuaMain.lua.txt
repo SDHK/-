@@ -1,0 +1,46 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2021/12/18 18:41:03
+
+ * 最后日期: 2021/12/18 23:12:43
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaMonoObjectItem"
+using "LuaMonoObjectPoolBuilder"
+using "LuaWindowBuilder"
+
+Script "CD"
+Script "ControlGameSet"
+Script "MouseCursor"
+Script "StateMainMenu"
+Script "MainCamera"
+Script "PlayerCamera"
+Script "PlayerControl"
+
+Script "LayerPool"
+Script "AircraftConfiguration"
+Script "BulletConfiguration"
+Script "WeaponConfiguration"
+
+coroutine.wrap(function()
+    AsyncDelay(100)
+
+    -- 单例主相机
+    MainCamera:Instance()
+
+    ControlGameSet:Instance()
+
+    -- 启动状态机
+    local focusStateMachine = FocusStateMachine.Get()
+
+    focusStateMachine:Set(StateMainMenu:Instance().focusState)
+
+    GlobalAsset:Set(focusStateMachine, "游戏流程状态机")
+end
+)()

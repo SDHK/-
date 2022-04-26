@@ -1,0 +1,100 @@
+﻿
+
+
+--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/03/18 23:55:36
+
+ * 最后日期: 2022/03/18 23:56:05
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+Script "Weapon001"
+Script "WeaponLaser"
+
+WeaponConfiguration = LuaObject:Extend({
+    TableName = 'WeaponConfiguration'
+})
+function WeaponConfiguration.GetPool(table, assetPath)
+    local pool = LuaMonoObjectPoolBuilder.Construct(table,
+        GlobalAsset:Get(assetPath .. "/" .. typeof(GameObject):ToString()))
+    pool.objectDestoryClock = 600
+    pool.objectDestoryIntervalClock = 1
+    return pool
+end
+
+
+Weapon001.playerWeapon = WeaponConfiguration.GetPool(Weapon001, CD.ABpfb_aircraft .. "/Weapon")
+function Weapon001.GetPlayerWeapon()
+    local weapon = Weapon001.playerWeapon:GetTable()
+    weapon.bulletGet = Bullet001.GetPlayerBullet
+    weapon.interval = 0.1 -- 射击间隔
+    weapon.multiple = 3 -- 多重
+    weapon.diffusion = 20 -- 扩散角度
+
+    weapon.damage = 10 -- 子弹伤害
+    weapon.speed = 100 -- 子弹速度
+    weapon.range = 200 -- 射程
+    return weapon
+end
+WeaponLaser.playerWeapon = WeaponConfiguration.GetPool(WeaponLaser, CD.ABpfb_aircraft .. "/Weapon")
+function WeaponLaser.GetPlayerWeapon()
+    local weapon = WeaponLaser.playerWeapon:GetTable()
+    weapon.bulletGet = BulletLaser.GetPlayerBullet
+    weapon.rotateRange = 0
+    weapon.rotateSpeed = 0
+
+    weapon.interval =  0.001 -- 射击间隔
+    weapon.preheat = 1 -- 射击预热
+
+    weapon.multiple = 3 -- 多重
+    weapon.diffusion = 20 -- 扩散角度
+
+    weapon.damage = 20 -- 子弹伤害
+    weapon.range = 200 -- 射程
+    return weapon
+end
+
+Weapon001.enemyWeapon = WeaponConfiguration.GetPool(Weapon001, CD.ABpfb_aircraft .. "/EnemyWeapon001")
+function Weapon001.GetEnemyWeapon001()
+    local weapon = Weapon001.enemyWeapon:GetTable()
+    weapon.bulletGet = Bullet001.GetEnemyBullet
+    weapon.rotateRange = 90
+    weapon.rotateSpeed = 30
+    weapon.interval = 5 -- 射击间隔
+    weapon.multiple = 1 -- 多重
+    weapon.diffusion = 30 -- 扩散角度
+
+    weapon.damage = 10 -- 子弹伤害
+    weapon.speed = 50 -- 子弹速度
+    weapon.range = 200 -- 射程
+    return weapon
+end
+
+
+
+
+
+WeaponLaser.enemyWeapon = WeaponConfiguration.GetPool(WeaponLaser, CD.ABpfb_aircraft .. "/EnemyWeaponLaser")
+function WeaponLaser.GetEnemyWeapon()
+    local weapon = WeaponLaser.enemyWeapon:GetTable()
+    weapon.bulletGet = BulletLaser.GetEnemyBullet
+    weapon.rotateRange = 300
+    weapon.rotateSpeed = 15
+
+    weapon.interval = 0.02 -- 射击间隔
+    weapon.preheat = 1 -- 射击预热
+
+    weapon.multiple = 1 -- 多重
+    weapon.diffusion = 0 -- 扩散角度
+
+    weapon.damage = 0.1 -- 子弹伤害
+    weapon.range = 200 -- 射程
+    return weapon
+end
+

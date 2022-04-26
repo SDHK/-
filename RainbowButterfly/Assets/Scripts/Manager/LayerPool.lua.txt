@@ -1,0 +1,159 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/03/19 23:02:29
+
+ * 最后日期: 2022/03/19 23:09:27
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using 'LuaObjectPoolBuilder'
+using "LuaSingletonItem"
+
+-- 对象池对象
+LayerPool = LuaSingletonItem:Extend({
+    TableName = 'LayerPool'
+})
+LayerPool.pool = LuaObjectPoolBuilder.Construct(LayerPool)
+LayerPool.pool.objectLimit = 1
+
+-- 获取对象
+function LayerPool.Get()
+    return LayerPool.pool:Get()
+end
+
+
+function LayerPool:AddRelation(layerName1, layerName2, relation)
+    GlobalAsset:Set(layerName2, "LayerPoolRelation/" .. relation .. "/" .. layerName1)
+    GlobalAsset:Set(layerName1, "LayerPoolRelation/" .. relation .. "/" .. layerName2)
+end
+
+
+function LayerPool:GetRelation(layerName1, relation)
+    return GlobalAsset:Get("LayerPoolRelation/" .. relation .. "/" .. layerName1)
+end
+
+-- function LayerPool:GetRelationLayer(layer1, relation)
+--     return GlobalAsset:Get("LayerPoolRelation/" .. relation .. "/" .. layerName1)
+-- end
+
+
+function LayerPool:GetRelationPool(layerName1, relation)
+    local layerName = GlobalAsset:Get("LayerPoolRelation/" .. relation .. "/" .. layerName1)
+    local layerPool = nil
+    if layerName then
+        layerPool = self:GetLayerPool(layerName)
+    end
+    return layerPool
+end
+
+
+function LayerPool:GetRecentRelation(monoTable, relation)
+    local position = monoTable.transform.position
+    local layerPool = self:GetRelationPool(LayerMask.LayerToName(monoTable.gameObject.layer), relation)
+
+    if layerPool then
+        return self:GetRecent(position, layerPool)
+    else
+        return nil
+    end
+
+end
+
+
+function LayerPool:GetRecentLayer(monoTable, LayerName)
+    local position = monoTable.transform.position
+    local layerPool = self:GetLayerPool(LayerName)
+    return self:GetRecent(position, layerPool)
+end
+
+
+function LayerPool:GetRecent(position, monoTableList)
+    if monoTableList.Count > 0 then
+        if monoTableList.Count == 1 then
+            return monoTableList[0]
+        else
+
+            local index = 0
+            local LateDistance = (position - monoTableList[0].transform.position).magnitude
+
+            for i = 1, monoTableList.Count - 1, 1 do
+                local newDistance = (position - monoTableList[i].transform.position).magnitude;
+                if newDistance <= LateDistance then
+                    index = i;
+                    LateDistance = newDistance;
+                end
+            end
+            return monoTableList[index]
+        end
+    else
+        return nil
+    end
+end
+
+
+function LayerPool:Add(monoTable)
+    local layerName = LayerMask.LayerToName(monoTable.gameObject.layer)
+    local layerPool = GlobalAsset:Get("LayerPool/" .. layerName)
+    if not layerPool then
+        layerPool = ObjectList()
+        GlobalAsset:Set(layerPool, "LayerPool/" .. layerName)
+    end
+
+    if not layerPool:Contains(monoTable) then
+        layerPool:Add(monoTable)
+    end
+end
+
+
+function LayerPool:Remove(monoTable)
+    local layerName = LayerMask.LayerToName(monoTable.gameObject.layer)
+
+    local layerPool = GlobalAsset:Get("LayerPool/" .. layerName)
+    if layerPool then
+        layerPool:Remove(monoTable)
+    end
+end
+
+
+function LayerPool:GetLayerPool(layerName)
+    local layerPool = GlobalAsset:Get("LayerPool/" .. layerName)
+    if not layerPool then
+        layerPool = ObjectList()
+        GlobalAsset:Set(layerPool, "LayerPool/" .. layerName)
+    end
+    return layerPool
+end
+
+
+function LayerPool:RecycleLayer(layerName)
+    local layerPool = GlobalAsset:Get("LayerPool/" .. layerName)
+    if layerPool then
+        self:RecycleObjectList(layerPool)
+    end
+end
+
+
+function LayerPool:RecycleAllLayer()
+
+    local LayerPools = GlobalAsset:Get("LayerPool")
+    if LayerPools then
+        for key, value in pairs(LayerPools) do
+            self:RecycleObjectList(value)
+        end
+    end
+end
+
+
+function LayerPool:RecycleObjectList(list)
+    while list.Count > 0 do
+        list[0]:ObjectRecycle()
+    end
+    list:Clear()
+end
+
+

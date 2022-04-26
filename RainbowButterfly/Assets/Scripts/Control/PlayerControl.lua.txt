@@ -1,0 +1,70 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/14 20:09:13
+
+ * 最后日期: 2022/02/14 20:19:32
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaObjectPoolBuilder"
+
+Script "MainCamera"
+Script "ControlBase"
+
+-- 对象池对象
+PlayerControl = ControlBase:Extend({TableName = "PlayerControl"})
+PlayerControl.pool = LuaObjectPoolBuilder.Construct(PlayerControl)
+PlayerControl.pool.objectDestoryClock = 600
+PlayerControl.pool.objectLimit = 1
+
+-- 获取对象
+function PlayerControl.Get()
+    return PlayerControl.pool:Get()
+end
+
+function PlayerControl:FocusStateEnter()
+    self.inputKeysManager = InputKeysManager.Instance()
+    self.playerCamera = PlayerCamera:Instance().camera
+end
+function PlayerControl:FocusStateUpdate()
+    self.moveDirection = Vector3.zero
+
+    if self.inputKeysManager:GetKeys("游戏控制", "前进") then
+        self.moveDirection = self.moveDirection + Vector3.up
+    end
+    if self.inputKeysManager:GetKeys("游戏控制", "后退") then
+        self.moveDirection = self.moveDirection + Vector3.down
+    end
+    if self.inputKeysManager:GetKeys("游戏控制", "左移") then
+        self.moveDirection = self.moveDirection + Vector3.left
+    end
+    if self.inputKeysManager:GetKeys("游戏控制", "右移") then
+        self.moveDirection = self.moveDirection + Vector3.right
+    end
+
+    --移动位置
+    self.aircraft.movePosition = self.moveDirection + self.aircraft.transform.position
+
+    --瞄准位置
+    self.aircraft.targetPosition = self.playerCamera:ScreenToWorldPoint(Input.mousePosition)
+
+
+    if self.inputKeysManager:GetKeysDown("游戏控制", "开火") then
+        self.aircraft:WeaponsFire(1)
+    end
+    if self.inputKeysManager:GetKeysUp("游戏控制", "开火") then
+        self.aircraft:WeaponsCeaseFire(1)
+    end
+end
+
+function PlayerControl:FocusStateExit()
+    self.aircraft:WeaponsCeaseFire(1)
+    self.inputKeysManager = nil
+    self.playerCamera = nil
+    self:ObjectRecycle()
+end

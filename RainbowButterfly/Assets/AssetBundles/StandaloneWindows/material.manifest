@@ -1,0 +1,45 @@
+ManifestFileVersion: 0
+CRC: 144256047
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 152824468020365624d4e5e85cd8ad52
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 7b58e8929cf592a1ce1fdc865511b46a
+HashAppended: 0
+ClassTypes:
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 84
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetsPackage/GameObjects/_General/Explosion/Material/ExplosionDebris.mat
+- Assets/AssetsPackage/GameObjects/Enemy/_General/Enemy.mat
+- Assets/AssetsPackage/GameObjects/Aircraft/Player/_General/Material/PlayerTrail.mat
+- Assets/AssetsPackage/UI/_General/Material/UIHighLight.mat
+- Assets/AssetsPackage/UI/UIs/_Global/MouseCursor/Material/MouseCursor.mat
+- Assets/AssetsPackage/UI/_General/Material/UIC1.mat
+- Assets/AssetsPackage/GameObjects/_General/Bullet/Material/EnemyBullet.mat
+- Assets/AssetsPackage/_General/Material/ImageScroll.mat
+- Assets/AssetsPackage/_General/Material/ImageRotation.mat
+- Assets/AssetsPackage/GameObjects/_General/Explosion/Material/LaserFlash.mat
+- Assets/AssetsPackage/GameObjects/_General/Explosion/Material/ExplosionFlash.mat
+- Assets/AssetsPackage/_General/Material/Stars.mat
+- Assets/AssetsPackage/_General/Material/Phantom_M.mat
+- Assets/AssetsPackage/UI/_General/Material/UIC2.mat
+- Assets/AssetsPackage/GameObjects/_General/Bullet/Material/PlayerBullet.mat
+- Assets/AssetsPackage/GameObjects/_General/Explosion/Material/ExplosionWave.mat
+- Assets/AssetsPackage/GameObjects/_General/Bullet/Material/LaserBullet.mat
+- Assets/AssetsPackage/UI/_General/Material/UICText.mat
+- Assets/AssetsPackage/_General/Material/ImagerRotation2.mat
+- Assets/AssetsPackage/UI/_General/Material/UIC3.mat
+- Assets/AssetsPackage/GameObjects/Aircraft/Player/_General/Material/PlayerAircraft.mat
+Dependencies:
+- E:/Make/GameEngine/Unity3D/2019_4_15f/2D/RainbowButterfly/Assets/AssetBundles/StandaloneWindows/pic_aircraft
+- E:/Make/GameEngine/Unity3D/2019_4_15f/2D/RainbowButterfly/Assets/AssetBundles/StandaloneWindows/pic_ui
+- E:/Make/GameEngine/Unity3D/2019_4_15f/2D/RainbowButterfly/Assets/AssetBundles/StandaloneWindows/shader

@@ -1,0 +1,49 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/17 22:00:03
+
+ * 最后日期: 2022/02/17 22:00:21
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaMonoObjectPoolBuilder"
+
+Script "BulletBase"
+Script "ExplosionFlash"
+
+-- Mono对象池对象
+Bullet001 = BulletBase:Extend({TableName = "Bullet001"})
+
+function Bullet001:ObjectOnNew() end
+
+function Bullet001:ObjectOnDestroy() end
+
+function Bullet001:ObjectOnGet()
+    self.gameObject:SetActive(false)
+    LayerPool:Instance():Add(self)
+end
+
+function Bullet001:ObjectOnRecycle() LayerPool:Instance():Remove(self) end
+
+function Bullet001:MonoFixedUpdate()
+    self.transform.position = self.transform.position + self.transform.up *
+                                  self.weapon.speed * Time.fixedDeltaTime
+    if (self.transform.position - self.weapon.transform.position).magnitude >
+        self.weapon.range then self:ObjectRecycle() end
+end
+
+function Bullet001:MonoOnCollisionEnter2D(collision2D)
+    if collision2D.gameObject.tag == "Aircraft" then
+        ExplosionFlash.Get():Play(CD.bulletFlashIntensity,
+                                  self.transform.position)
+        collision2D.gameObject:GetComponent(typeof(LuaMonoObject)).table:Hit(
+            self.weapon.damage)
+        self:ObjectRecycle()
+    end
+end
+

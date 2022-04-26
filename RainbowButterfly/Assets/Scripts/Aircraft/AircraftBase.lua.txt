@@ -1,0 +1,129 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/03/03 04:25:37
+
+ * 最后日期: 2022/03/03 04:25:49
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaMonoObjectItem"
+
+---@class AircraftBase 飞船对象池对象基类 继承LuaMonoObjectItem
+---@field controlMachine FocusStateMachine 控制器焦点状态机，在状态写战机行为
+---@field hpMax float 战机最大血量
+---@field hp float 战机血量
+---@field speed float  战机速度
+---@field movePosition Vector3  移动位置
+---@field targetPosition Vector3 瞄准的目标
+---@field weaponList table 武器列表
+---@field Default function Default() 字段变回初始默认
+---@field Hit function Hit(hp) 设置攻击伤害，hp归0调用Death()
+---@field Death function Death() 死亡
+---@field WeaponsFire function WeaponsFire(index) 武器开火
+---@field WeaponsCeaseFire function WeaponsCeaseFire(index) 武器停火
+AircraftBase = LuaMonoObjectItem:Extend({
+    TableName = "AircraftBase",
+    isDeath = false,
+    score = 0,
+    controlMachine = nil,
+    collisionDamage = 0,
+    hpMax = 0,
+    hp = 0,
+    rigidbody2D = nil,
+    movePosition = Vector3.zero,
+    targetPosition = Vector3.zero,
+    speed = 0,
+    rotationSpeed = 0,
+    weaponList = nil,
+    OnHit = nil,
+    OnDeath = nil,
+    OnRepair = nil
+})
+
+function AircraftBase:Default()
+    self.controlMachine = nil
+    self.collisionDamage = 0
+    self.isDeath = false
+    self.score = 0
+    self.hpMax = 0
+    self.hp = 0
+    self.speed = 0
+    self.rotationSpeed = 0
+    self.movePosition = Vector3.zero
+    self.targetPosition = Vector3.zero
+    self.OnHit = nil
+    self.OnDeath = nil
+    self.OnRepair = nil
+
+    self:WeaponsRecycle()
+end
+
+function AircraftBase:Hit(hp)
+    if not self.isDeath then
+        self.hp = Mathf.Clamp(self.hp - hp, 0, self.hpMax)
+
+        if self.OnHit then self:OnHit() end
+
+        if self.hp == 0 then
+            self.isDeath = true
+            ControlGame:Instance():Score(self.score)
+            if self.OnDeath then self:OnDeath() end
+            self:Death()
+        end
+    end
+end
+
+function AircraftBase:Repair(hp)
+    self.hp = Mathf.Clamp(self.hp + hp, 0, self.hpMax)
+    if self.OnRepair then self:OnRepair() end
+end
+
+function AircraftBase:Death() print(self.TableName .. ":Death()") end
+
+function AircraftBase:WeaponsFire(index)
+    if #self.weaponList >= index then self.weaponList[index]:Fire() end
+end
+
+function AircraftBase:WeaponsCeaseFire(index)
+    if #self.weaponList >= index then self.weaponList[index]:CeaseFire() end
+end
+
+function AircraftBase:AddWeapon(weapon)
+    table.insert(self.weaponList, weapon)
+    weapon.aircraft = self
+    weapon.transform:SetParent(self.transform)
+    weapon:SetPosition(Vector3.zero, Vector3.zero)
+    return weapon
+end
+
+function AircraftBase:WeaponsRecycle()
+    for index, value in ipairs(self.weaponList) do
+        value:ObjectRecycle()
+        self.weaponList[index] = nil
+    end
+end
+
+function AircraftBase:GetControl()
+    if self.controlMachine then
+        return self.controlMachine.State.table
+    else
+        return nil
+    end
+end
+
+function AircraftBase:SetControl(control)
+    if self.controlMachine then self.controlMachine = FocusStateMachine.Get() end
+
+    if control then
+        control:SetAircraft(self)
+        self.controlMachine:Set(control.focusState)
+    else
+        self.controlMachine:Set(nil)
+    end
+end
+

@@ -1,0 +1,20 @@
+ManifestFileVersion: 0
+CRC: 3922359613
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 1c9eae8eb25754e9e6d0fe83e0ae62d4
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 21797eef6b5a2c4cfa475ffdff97c619
+HashAppended: 0
+ClassTypes:
+- Class: 114
+  Script: {fileID: 11500000, guid: 0b2db86121404754db890f4c8dfe81b2, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: d7fd9488000d3734a9e00ee676215985, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetsPackage/UI/UIs/_Global/Global Volume Profile.asset
+Dependencies: []

@@ -1,0 +1,67 @@
+﻿
+--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/11 23:41:25
+
+ * 最后日期: 2022/02/11 23:41:41
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaMonoObjectPoolBuilder"
+
+-- Mono对象池对象
+ScrollListInputField = LuaMonoObjectItem:Extend({TableName = "ScrollListInputField"})
+ScrollListInputField.pool =
+    LuaMonoObjectPoolBuilder.Construct(
+    ScrollListInputField,
+    GlobalAsset:Get(CD.ABpfb_ui, CD.AB_ScrollListInputField, typeof(GameObject):ToString())
+)
+
+-- 获取对象
+function ScrollListInputField.Get()
+    return ScrollListInputField.pool:GetTable()
+end
+
+-- 获取对象，并设置父物体
+function ScrollListInputField.Get(parent)
+    return ScrollListInputField.pool:GetTable(parent)
+end
+
+function ScrollListInputField:ObjectOnNew()
+    local gameObject = self.gameObject
+    self.languageText = gameObject:SetComponent(typeof(LanguageText), "LanguageText")
+    self.inputField = gameObject:SetComponent(typeof(InputField), "InputField")
+    self.inputField.onEndEdit:AddListener(
+        function(str)
+            self.value = Mathf.Clamp(Int32.Parse(str), self.min, self.max)
+            self.inputField.text = String.Format("{0:F0}", self.value)
+            self.Callback(self.value)
+        end
+    )
+end
+
+function ScrollListInputField:ObjectOnDestroy()
+    self.inputField.onEndEdit:RemoveAllListeners()
+end
+
+function ScrollListInputField:ObjectOnGet()
+    self.transform:Default()
+end
+
+function ScrollListInputField:ObjectOnRecycle()
+end
+
+function ScrollListInputField:Refresh(languagePath, value, min, max, callback)
+    self.languageText:SetPath(languagePath)
+    self.value = Mathf.Clamp(value, min, max)
+    self.min = min
+    self.max = max
+    self.Callback = callback
+
+    self.inputField.text = self.value
+end

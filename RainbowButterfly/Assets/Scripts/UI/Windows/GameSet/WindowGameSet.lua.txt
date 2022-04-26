@@ -1,0 +1,163 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/06 14:21:29
+
+ * 最后日期: 2022/02/06 14:42:06
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaMonoObjectPoolBuilder"
+using "LuaWindowBuilder"
+using "LuaMonoSingletonItem"
+
+Script "PageGameSet"
+Script "PageKeyBind"
+Script "PageScreen"
+
+-- Mono对象池对象
+WindowGameSet = LuaMonoSingletonItem:Extend({
+    TableName = "WindowGameSet"
+})
+WindowGameSet.pool = LuaMonoObjectPoolBuilder.Construct(WindowGameSet, GlobalAsset:Get(CD.ABpfb_ui, CD.AB_WindowGameSet,
+    typeof(GameObject):ToString()))
+
+WindowGameSet.pool.objectDestoryClock = 600
+
+WindowGameSet.pool.objectLimit = 1
+
+-- 获取对象，并设置父物体
+function WindowGameSet.Get(parent)
+    return WindowGameSet.pool:GetTable(parent)
+end
+
+
+-- 获取对象
+function WindowGameSet.Get()
+    return WindowGameSet.pool:GetTable()
+end
+
+
+function WindowGameSet:ObjectOnNew()
+    self.window = LuaWindowBuilder.Construct(self)
+    self.inputKeysManager = InputKeysManager.Instance()
+    self.focusStateMachine = FocusStateMachine.Get()
+
+    local gameObject = self.gameObject
+
+    self.canvasGroup = gameObject:SetComponent(typeof(CanvasGroup))
+    self.canvasGroup.alpha = 0
+    self.canvasGroup.interactable = false
+
+    self.returnBtn = gameObject:SetComponent(typeof(Button), "ReturnBtn")
+    self.toggleGroup = gameObject:SetComponent(typeof(ToggleGroup), "ToggleGroup")
+
+    self.gameSetToggle = gameObject:SetComponent(typeof(Toggle), "GameSetToggle")
+    self.keyBindToggle = gameObject:SetComponent(typeof(Toggle), "KeyBindToggle")
+    self.ScreenToggle = gameObject:SetComponent(typeof(Toggle), "ScreenToggle")
+
+    local PagesTransform = gameObject:FindChildDeep("Pages").transform
+    self.pageGameSet = PageGameSet.Get(PagesTransform)
+    self.pageKeyBind = PageKeyBind.Get(PagesTransform)
+    self.pageScreen = PageScreen.Get(PagesTransform)
+
+    self.returnBtn.gameObject:SetComponent(typeof(LanguageText), "Text"):SetPath("游戏设置窗口/返回")
+
+    self.gameSetToggle.gameObject:SetComponent(typeof(LanguageText), "Text"):SetPath("游戏设置窗口/游戏设置")
+    self.keyBindToggle.gameObject:SetComponent(typeof(LanguageText), "Text"):SetPath("游戏设置窗口/按键绑定")
+    self.ScreenToggle.gameObject:SetComponent(typeof(LanguageText), "Text"):SetPath("游戏设置窗口/显示设置")
+
+
+    self.gameSetToggle.onValueChanged:AddListener(function(bit)
+        if bit then
+            self.focusStateMachine:Set(self.pageGameSet.focusState)
+        end
+    end
+)
+    self.keyBindToggle.onValueChanged:AddListener(function(bit)
+        if bit then
+            self.focusStateMachine:Set(self.pageKeyBind.focusState)
+        end
+    end
+)
+
+    self.ScreenToggle.onValueChanged:AddListener(function(bit)
+        if bit then
+            self.focusStateMachine:Set(self.pageScreen.focusState)
+        end
+    end
+)
+end
+
+
+function WindowGameSet:ObjectOnDestroy()
+    self.focusStateMachine:ObjectRecycle()
+    self.focusStateMachine = nil
+    self.gameSetToggle.onValueChanged:RemoveAllListeners()
+    self.keyBindToggle.onValueChanged:RemoveAllListeners()
+    self.ScreenToggle.onValueChanged:RemoveAllListeners()
+end
+
+
+function WindowGameSet:ObjectOnGet()
+    local transform = self.transform
+    transform:SetParent(CanvasServer.Instance():GetLayer(CD.Layer1, ""))
+    transform:GetRectTransform():RectAllStretch()
+    transform:Default()
+end
+
+
+function WindowGameSet:ObjectOnRecycle()
+end
+
+
+function WindowGameSet:WaitStackStateEnter(EnterDone)
+    self.gameObject:SetActive(true)
+    self.canvasGroup:DOFade(1, CD.WindowFadeSpeed):SetUpdate(true):OnComplete(function()
+        EnterDone()
+        self.canvasGroup.interactable = true
+    end
+)
+end
+
+
+function WindowGameSet:WaitStackStateExit(ExitDone)
+    self.canvasGroup.interactable = false
+    self.canvasGroup:DOFade(0, CD.WindowFadeSpeed):SetUpdate(true):OnComplete(function()
+        ExitDone()
+    end
+)
+end
+
+function WindowGameSet:StackStateEnter()
+    EventSystem.current:SetSelectedGameObject(self.gameSetToggle.gameObject)
+    self.gameSetToggle.isOn = true
+    -- 设置初始选中物体
+end
+
+function WindowGameSet:StackStateExit()
+    ControlGameSet.SaveGameSet()
+    ControlGameSet.SaveInputKeys()
+    -- self:ObjectRecycle()
+    self.gameObject:SetActive(false)
+
+end
+
+function WindowGameSet:FocusStateEnter()
+
+end
+
+function WindowGameSet:FocusStateExit()
+end
+
+
+function WindowGameSet:FocusStateUpdate()
+    if self.inputKeysManager:GetKeysDown("界面快捷键", "返回") then
+        self.windowClose()
+    end
+end
+

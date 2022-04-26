@@ -1,0 +1,2 @@
+﻿
+ControlConfiguration=LuaObject:Extend({TableName = 'ControlConfiguration'})

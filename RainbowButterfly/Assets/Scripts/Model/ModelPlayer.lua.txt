@@ -1,0 +1,50 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/25 15:32:49
+
+ * 最后日期: 2022/02/25 15:37:32
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaObjectPoolBuilder"
+using "LuaSingletonItem"
+
+-- Mono对象池对象
+ModelPlayer = LuaSingletonItem:Extend({
+    TableName = "ModelPlayer"
+})
+ModelPlayer.pool = LuaObjectPoolBuilder.Construct(ModelPlayer)
+
+-- 获取对象
+function ModelPlayer.Get()
+    return ModelPlayer.pool:Get()
+end
+
+function ModelPlayer:SetAircraft(aircraft)
+    self.aircraft = aircraft
+end
+
+
+function ModelPlayer:ObjectOnNew()
+    self.aircraft = nil
+
+end
+
+
+function ModelPlayer:ObjectOnDestroy()
+end
+
+
+function ModelPlayer:ObjectOnGet()
+end
+
+
+function ModelPlayer:ObjectOnRecycle()
+end
+
+

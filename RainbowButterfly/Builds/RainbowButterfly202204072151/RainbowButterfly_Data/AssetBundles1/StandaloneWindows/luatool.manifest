@@ -1,0 +1,29 @@
+ManifestFileVersion: 0
+CRC: 2601539321
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 1cef7e817d10c5f8907c12b91a519d53
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 5ad585dd02dfb5016c0dad519eab8f49
+HashAppended: 0
+ClassTypes:
+- Class: 49
+  Script: {instanceID: 0}
+Assets:
+- Assets/SDHK_ToolKit/Lua/LuaTool/ObjectPool/LuaObjectItem.lua.txt
+- Assets/SDHK_ToolKit/Lua/LuaTool/ObjectPool/LuaMonoObjectItem.lua.txt
+- Assets/SDHK_ToolKit/Lua/LuaTool/StateMachine/FocusStateMachine/LuaFocusStateBuilder.lua.txt
+- Assets/SDHK_ToolKit/Lua/LuaTool/0Requires/SDHK_ToolKit.lua.txt
+- Assets/SDHK_ToolKit/Lua/LuaTool/0Requires/UnityEngine.lua.txt
+- Assets/SDHK_ToolKit/Lua/LuaTool/StateMachine/StackStateMachine/LuaStackStateBuilder.lua.txt
+- Assets/SDHK_ToolKit/Lua/LuaTool/ObjectPool/LuaMonoObjectPoolBuilder.lua.txt
+- Assets/SDHK_ToolKit/Lua/LuaTool/0Requires/LuaToolRequires.lua.txt
+- Assets/SDHK_ToolKit/Lua/LuaTool/WindowUI/LuaWindowBuilder.lua.txt
+- Assets/SDHK_ToolKit/Lua/LuaTool/Singleton/LuaSingletonItem.lua.txt
+- Assets/SDHK_ToolKit/Lua/LuaTool/ObjectPool/LuaObjectPoolBuilder.lua.txt
+- Assets/SDHK_ToolKit/Lua/LuaTool/Object/Base.lua.txt
+- Assets/SDHK_ToolKit/Lua/LuaTool/Singleton/LuaMonoSingletonItem.lua.txt
+- Assets/SDHK_ToolKit/Lua/LuaTool/Object/LuaObject.lua.txt
+Dependencies: []

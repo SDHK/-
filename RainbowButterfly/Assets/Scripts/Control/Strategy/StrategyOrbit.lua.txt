@@ -1,0 +1,83 @@
+﻿
+--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/03/11 15:37:51
+
+ * 最后日期: 2022/03/11 15:38:11
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaObjectPoolBuilder"
+Script "StrategyBase"
+
+-- 对象池对象
+StrategyOrbit = StrategyBase:Extend({
+    TableName = "StrategyOrbit"
+})
+StrategyOrbit.pool = LuaObjectPoolBuilder.Construct(StrategyOrbit)
+
+-- 获取对象
+function StrategyOrbit.Get()
+    return StrategyOrbit.pool:Get()
+end
+
+
+function StrategyOrbit:ObjectOnNew()
+    self.focusState = LuaFocusStateBuilder.Construct(self)
+end
+
+
+function StrategyOrbit:ObjectOnDestroy()
+    self.focusState = nil
+end
+
+
+function StrategyOrbit:ObjectOnGet()
+    self.control = nil
+    self.target = nil
+    self.offset = Vector2.zero
+    self.radius = 30
+    self.timeSpeed = 1
+    self.timeSpeedX = 1
+    self.timeSpeedY = 1
+    self.timeOffset = 0
+    self.timeOffsetX = 0
+    self.timeOffsetY = 0
+end
+
+
+function StrategyOrbit:ObjectOnRecycle()
+end
+
+
+function StrategyOrbit:FocusStateEnter()
+end
+
+
+function StrategyOrbit:FocusStateUpdate()
+
+    if self.control.aircraft then
+        if IsNull(self.target) then
+            self.target = LayerPool:Instance():GetRecentRelation(self.control.aircraft, "Aircraft").transform
+        else
+            local tx = (Time.time + (self.timeOffset + self.timeOffsetX)) * (self.timeSpeed * self.timeSpeedX)
+            local ty = (Time.time + (self.timeOffset + self.timeOffsetY)) * (self.timeSpeed * self.timeSpeedY)
+
+            self.control.aircraft.movePosition =
+                Vector3(Mathf.Sin(tx) + self.offset.x, Mathf.Cos(ty) + self.offset.y, 0) * self.radius +
+                    self.target.position
+        end
+    end
+end
+
+
+function StrategyOrbit:FocusStateExit()
+    self:ObjectRecycle()
+end
+
+

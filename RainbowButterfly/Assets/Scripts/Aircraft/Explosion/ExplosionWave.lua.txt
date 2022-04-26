@@ -1,0 +1,67 @@
+﻿
+--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/03/04 18:29:58
+
+ * 最后日期: 2022/03/04 18:32:46
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]]--------------------
+using "LuaMonoObjectPoolBuilder"
+
+-- Mono对象池对象
+ExplosionWave = LuaMonoObjectItem:Extend({TableName = "ExplosionWave"})
+ExplosionWave.pool =
+    LuaMonoObjectPoolBuilder.Construct(
+    ExplosionWave,
+    GlobalAsset:Get(CD.ABpfb_aircraft, "ExplosionWave", typeof(GameObject):ToString())
+)
+ExplosionWave.pool.objectDestoryClock = 60
+ExplosionWave.pool.objectDestoryIntervalClock = 1
+
+
+-- 获取对象
+function ExplosionWave.Get()
+    return ExplosionWave.pool:GetTable()
+end
+
+-- 获取对象，并设置父物体
+function ExplosionWave.Get(parent)
+    return ExplosionWave.pool:GetTable(parent)
+end
+function ExplosionWave:Play(color,vector3)
+    self.material:SetColor("_Color", color)
+    self.transform.position = vector3
+    self.particle:Play()
+    self.clock:Run()
+end
+function ExplosionWave:ObjectOnNew()
+    self.particle = self.gameObject:GetComponent(typeof(ParticleSystem))
+    self.material = self.gameObject:GetComponent(typeof(Renderer)).material
+    self.particleMian = self.particle.main
+end
+
+function ExplosionWave:ObjectOnDestroy()
+end
+
+function ExplosionWave:ObjectOnGet()
+    self.clock =
+        Clock.Get():Set(
+        self.particleMian.duration,
+        function()
+            self:ObjectRecycle()
+        end
+    )
+end
+
+function ExplosionWave:ObjectOnRecycle()
+    self.clock:ObjectRecycle()
+end
+
+function ExplosionWave:MonoUpdate()
+end

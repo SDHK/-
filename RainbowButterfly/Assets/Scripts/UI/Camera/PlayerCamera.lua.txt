@@ -1,0 +1,73 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/15 20:46:02
+
+ * 最后日期: 2022/02/15 20:46:41
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaMonoObjectPoolBuilder"
+using "LuaMonoSingletonItem"
+
+-- Mono对象池对象
+PlayerCamera = LuaMonoSingletonItem:Extend({
+    TableName = "PlayerCamera"
+})
+PlayerCamera.pool = LuaMonoObjectPoolBuilder.Construct(PlayerCamera, GlobalAsset:Get(CD.ABpfb_ui, CD.AB_PlayerCamera,
+    typeof(GameObject):ToString()))
+PlayerCamera.pool.objectLimit = 1
+
+-- 获取对象
+function PlayerCamera.Get()
+    return PlayerCamera.pool:GetTable()
+end
+
+
+-- 获取对象，并设置父物体
+function PlayerCamera.Get(parent)
+    return PlayerCamera.pool:GetTable(parent)
+end
+
+
+function PlayerCamera:FollowTarget(target)
+    self.target = target
+end
+
+
+function PlayerCamera:DoMove(endValue)
+    self.target = nil
+    self.transform:DOMove(endValue, 1):SetUpdate(true)
+end
+
+
+function PlayerCamera:ObjectOnNew()
+end
+
+
+function PlayerCamera:ObjectOnDestroy()
+end
+
+
+function PlayerCamera:ObjectOnGet()
+    self.camera = self.gameObject:FindChildDeep("Camera"):GetComponent(typeof(Camera))
+    self.velocity = 0
+end
+
+
+function PlayerCamera:ObjectOnRecycle()
+end
+
+
+function PlayerCamera:MonoFixedUpdate()
+    if not IsNull(self.target) then
+        self.transform.position = Vector3.Lerp(self.transform.position, self.target.position,
+            5 * Time.fixedUnscaledDeltaTime)
+    end
+end
+
+

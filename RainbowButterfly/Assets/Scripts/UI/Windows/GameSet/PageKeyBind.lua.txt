@@ -1,0 +1,121 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/10 21:25:36
+
+ * 最后日期: 2022/02/10 21:26:08
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaMonoObjectPoolBuilder"
+Script "KeyToggle"
+Script "WindowConfirm"
+Script "ScrollListKeyBind"
+
+-- Mono对象池对象
+PageKeyBind = LuaMonoObjectItem:Extend({TableName = "PageKeyBind"})
+PageKeyBind.pool =
+    LuaMonoObjectPoolBuilder.Construct(
+    PageKeyBind,
+    GlobalAsset:Get(CD.ABpfb_ui, CD.AB_PageKeyBind, typeof(GameObject):ToString())
+)
+PageKeyBind.pool.objectDestoryClock = 600
+PageKeyBind.pool.objectLimit = 1
+
+-- 获取对象
+function PageKeyBind.Get()
+    return PageKeyBind.pool:GetTable()
+end
+
+-- 获取对象，并设置父物体
+function PageKeyBind.Get(parent)
+    return PageKeyBind.pool:GetTable(parent)
+end
+
+function PageKeyBind:ObjectOnNew()
+    self.focusState = LuaFocusStateBuilder.Construct(self)
+
+    self.inputKeysManager = InputKeysManager.Instance()
+
+    local gameObject = self.gameObject
+
+    self.keyToggles = {}
+    self.keyBindBoxes = {}
+    self.content = gameObject:SetComponent(typeof(Transform), "Content")
+    self.defaultSettingsBtn = gameObject:SetComponent(typeof(Button), "DefaultSettingsBtn")
+    self.defaultSettingsBtn.gameObject:SetComponent(typeof(LanguageText), "Text"):SetPath("游戏设置窗口/恢复默认设置")
+
+    self.keyToggleGroup = gameObject:SetComponent(typeof(ToggleGroup), "KeyToggleGroup")
+
+    self.refreshContent = function(groupName)
+        for key, value in pairs(self.keyBindBoxes) do
+            value:ObjectRecycle()
+            self.keyBindBoxes[key] = nil
+        end
+
+        for key, value in pairs(self.inputKeysManager:GetGroup(groupName)) do
+            local keyBindBox = ScrollListKeyBind.Get()
+            keyBindBox:Refresh(groupName, key)
+            table.insert(self.keyBindBoxes, keyBindBox)
+            keyBindBox.mono.transform:SetParent(self.content)
+            keyBindBox.mono.transform:Default()
+        end
+    end
+
+end
+
+function PageKeyBind:ObjectOnDestroy()
+    self.defaultSettingsBtn.onClick:RemoveAllListeners()
+end
+
+function PageKeyBind:ObjectOnGet()
+    self.gameObject:SetActive(false)
+end
+
+function PageKeyBind:ObjectOnRecycle()
+    self:Recycle()
+end
+
+function PageKeyBind:MonoUpdate()
+end
+
+function PageKeyBind:FocusStateEnter()
+    self.gameObject:SetActive(true)
+    self:Refresh()
+end
+function PageKeyBind:FocusStateExit()
+    self.gameObject:SetActive(false)
+    self:Recycle()
+end
+
+function PageKeyBind:Recycle()
+    for key, value in pairs(self.keyToggles) do
+        value:ObjectRecycle()
+        self.keyToggles[key] = nil
+    end
+
+    for key, value in pairs(self.keyBindBoxes) do
+        value:ObjectRecycle()
+        self.keyBindBoxes[key] = nil
+    end
+end
+
+function PageKeyBind:Refresh()
+    self:Recycle()
+
+    for key, value in pairs(self.inputKeysManager.inputKeyGroups) do
+        local keyToggle = KeyToggle.Get(self.keyToggleGroup.transform)
+        keyToggle.toggle.group = self.keyToggleGroup
+
+        keyToggle:Refresh(self.refreshContent, key)
+
+        table.insert(self.keyToggles, keyToggle)
+    end
+    if #self.keyToggles > 0 then
+        self.keyToggles[1].toggle.isOn = true
+    end
+end

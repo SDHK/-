@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Sprite001
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 3
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 0
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 1
+    variantMultiplier: 1
+    packables:
+    - {fileID: 102900000, guid: 13f18896d5e2b4348a5a4d4233ecd0b4, type: 3}
+    bindAsDefault: 1
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 97415b70f0ce4ec48b89809efa948b7a, type: 3}
+  - {fileID: 21300000, guid: fa402ea1483d4574f909dcfb2a80afef, type: 3}
+  - {fileID: 21300000, guid: 3d100e9315141474aa1c0e288a4d6029, type: 3}
+  - {fileID: 21300000, guid: 0d2dd12514bc4f144a119d9ac81f902a, type: 3}
+  - {fileID: 21300000, guid: 63bf621763ea4f34ea60e094ee36de34, type: 3}
+  - {fileID: 21300000, guid: d5d45838f2202fc478887f52fdd8ad2d, type: 3}
+  - {fileID: 21300000, guid: ace8b4d8dc2d2e74084c5b87ac276b33, type: 3}
+  - {fileID: 21300000, guid: d0367c6abc7c10f458465ed95b2468f7, type: 3}
+  - {fileID: 21300000, guid: 5de5ce0e463d8b246ade7af6cf7dc166, type: 3}
+  - {fileID: 21300000, guid: 3b64d0ff2f39846468fd203bb581ea1f, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - RainbowButterfly
+  - "\u7EBF\u6761V4_4"
+  - "\u7EBF\u68460_2"
+  - "\u7EBF\u6761H4_2"
+  - "\u7EBF\u6761H4_4"
+  - "\u7EBF\u6761V4_2"
+  - "\u7EBF\u68464_2"
+  - "\u7EBF\u68464_4"
+  - "\u7EBF\u68464_3"
+  - "\u7EBF\u68464_1"
+  m_Tag: Sprite001
+  m_IsVariant: 0

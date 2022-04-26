@@ -1,0 +1,77 @@
+﻿
+--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/10 01:43:45
+
+ * 最后日期: 2022/02/10 01:44:31
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaMonoObjectPoolBuilder"
+
+-- Mono对象池对象
+ScrollListDropdownString = LuaMonoObjectItem:Extend({TableName = "ScrollListDropdownString"})
+ScrollListDropdownString.pool =
+    LuaMonoObjectPoolBuilder.Construct(
+    ScrollListDropdownString,
+    GlobalAsset:Get(CD.ABpfb_ui, CD.AB_ScrollListDropdown, typeof(GameObject):ToString())
+)
+
+ScrollListDropdownString.pool.objectDestoryClock = 600
+
+-- 获取对象
+function ScrollListDropdownString.Get()
+    return ScrollListDropdownString.pool:GetTable()
+end
+
+-- 获取对象，并设置父物体
+function ScrollListDropdownString.Get(parent)
+    return ScrollListDropdownString.pool:GetTable(parent)
+end
+
+function ScrollListDropdownString:ObjectOnNew()
+    local gameObject = self.gameObject
+    self.languageText = gameObject:SetComponent(typeof(LanguageText), "LanguageText")
+
+    self.dropdown = gameObject:SetComponent(typeof(Dropdown), "Dropdown")
+
+    self.DropdownCallBack = function(index)
+        if self.callback then
+            self.callback(self.strs[index])
+        end
+    end
+
+    self.dropdown.onValueChanged:AddListener(self.DropdownCallBack)
+end
+
+function ScrollListDropdownString:ObjectOnDestroy()
+    self.dropdown.onValueChanged:RemoveAllListeners()
+end
+
+function ScrollListDropdownString:ObjectOnGet()
+    self.transform:Default()
+
+    --?!
+end
+
+function ScrollListDropdownString:ObjectOnRecycle()
+end
+
+function ScrollListDropdownString:Refresh(languagePath, strs, str, callback)
+    self.languageText:SetPath(languagePath)
+    self.dropdown:ClearOptions()
+    self.dropdown:AddOptions(strs)
+    self.strs = strs
+    self.dropdown.value =
+        strs:FindIndex(
+        function(name_)
+            return name_ == str
+        end
+    )
+    self.callback = callback
+end

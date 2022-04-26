@@ -1,0 +1,42 @@
+ManifestFileVersion: 0
+CRC: 2562230777
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: luatool
+      Dependencies: {}
+    Info_1:
+      Name: gamevalue
+      Dependencies: {}
+    Info_2:
+      Name: _rootdata
+      Dependencies: {}
+    Info_3:
+      Name: lua
+      Dependencies: {}
+    Info_4:
+      Name: material
+      Dependencies:
+        Dependency_0: pic_ui
+        Dependency_1: shader
+        Dependency_2: pic_aircraft
+    Info_5:
+      Name: pfb_ui
+      Dependencies:
+        Dependency_0: gamevalue
+        Dependency_1: material
+        Dependency_2: pic_ui
+    Info_6:
+      Name: pic_ui
+      Dependencies: {}
+    Info_7:
+      Name: shader
+      Dependencies: {}
+    Info_8:
+      Name: pic_aircraft
+      Dependencies: {}
+    Info_9:
+      Name: pfb_aircraft
+      Dependencies:
+        Dependency_0: material
+        Dependency_1: pic_aircraft

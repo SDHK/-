@@ -1,0 +1,52 @@
+﻿
+--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/04/01 17:05:01
+
+ * 最后日期: 2022/04/02 10:40:03
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]]--------------------
+using 'LuaMonoObjectPoolBuilder'
+using "LuaMonoSingletonItem"
+
+-- Mono对象池对象
+Stars = LuaMonoSingletonItem:Extend({TableName = 'Stars'})
+Stars.pool = LuaMonoObjectPoolBuilder.Construct(Stars, GlobalAsset:Get(
+                                                    CD.ABpfb_aircraft,
+                                                    CD.AB_Stars, typeof(
+                                                        GameObject):ToString()))
+
+-- 获取对象
+function Stars.Get() return Stars.pool:GetTable() end
+
+-- 获取对象，并设置父物体
+function Stars.Get(parent) return Stars.pool:GetTable(parent) end
+
+-- function Stars:FollowTarget(target) self.target = target end
+
+-- function Stars:SetPosition(vector4) self.material:SetVector("Position", vector4) end
+
+function Stars:ObjectOnNew()
+    self.target = nil
+    self.material = self.gameObject:GetComponent(typeof(Renderer)).material
+end
+
+function Stars:ObjectOnDestroy() end
+
+function Stars:ObjectOnGet() end
+
+function Stars:ObjectOnRecycle() end
+
+function Stars:MonoFixedUpdate()
+    -- if not IsNull(self.target) then
+    --     self:SetPosition(Vector4(self.target.position.x, self.target.position.y,
+    --                              0, 0))
+    -- end
+end
+

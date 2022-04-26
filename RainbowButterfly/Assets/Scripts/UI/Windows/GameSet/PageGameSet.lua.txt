@@ -1,0 +1,99 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/10 00:42:02
+
+ * 最后日期: 2022/02/10 00:43:05
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+ 
+
+--]] --------------------
+using "LuaMonoObjectPoolBuilder"
+using "LuaFocusStateBuilder"
+Script "WindowConfirm"
+Script "ScrollListDropdownString"
+
+-- Mono对象池对象
+PageGameSet = LuaMonoObjectItem:Extend({
+    TableName = "PageGameSet"
+})
+PageGameSet.pool = LuaMonoObjectPoolBuilder.Construct(PageGameSet, GlobalAsset:Get(CD.ABpfb_ui, CD.AB_PageGameSet,
+    typeof(GameObject):ToString()))
+
+PageGameSet.pool.objectDestoryClock = 600
+PageGameSet.pool.objectLimit = 1
+
+-- 获取对象
+function PageGameSet.Get()
+    return PageGameSet.pool:GetTable()
+end
+
+
+-- 获取对象，并设置父物体
+function PageGameSet.Get(parent)
+    return PageGameSet.pool:GetTable(parent)
+end
+
+
+function PageGameSet:ObjectOnNew()
+    self.focusState = LuaFocusStateBuilder.Construct(self)
+    self.languageManager = LanguageManager.Instance()
+
+    local gameObject = self.gameObject
+
+    self.canvasGroup = gameObject:SetComponent(typeof(CanvasGroup))
+    -- ?暂时无用
+
+    self.content = gameObject:SetComponent(typeof(Transform), "Content")
+    self.defaultSettingsBtn = gameObject:SetComponent(typeof(Button), "DefaultSettingsBtn")
+    self.defaultSettingsBtn.gameObject:SetComponent(typeof(LanguageText), "Text"):SetPath(
+        "游戏设置窗口/恢复默认设置")
+
+end
+
+
+function PageGameSet:ObjectOnDestroy()
+    self.defaultSettingsBtn.onClick:RemoveAllListeners()
+    self.gameSetToggle.onValueChanged:RemoveAllListeners()
+end
+
+
+function PageGameSet:ObjectOnGet()
+    self.gameObject:SetActive(false)
+    self.languageSwitchDropdownBox = ScrollListDropdownString.Get(self.content)
+end
+
+
+function PageGameSet:ObjectOnRecycle()
+    self.languageSwitchDropdownBox:ObjectRecycle()
+    self.languageSwitchDropdownBox = nil
+end
+
+
+function PageGameSet:FocusStateEnter()
+    self.gameObject:SetActive(true)
+    self:Refresh()
+end
+
+
+function PageGameSet:FocusStateExit()
+    ControlGameSet.SaveGameSet()
+    self.gameObject:SetActive(false)
+    -- self:Recycle()
+end
+
+
+function PageGameSet:Refresh()
+    -- self.languageSwitchDropdownBox = self.languageSwitchDropdownBox or ScrollListDropdownString.Get(self.content)
+    self.languageSwitchDropdownBox:Refresh("游戏设置页面/语言", GlobalAsset:Node("LanguageSwitch"):GetKeys(),
+        GlobalAsset:Get("GameSet/Language"), function(str)
+            GlobalAsset:Set(str, "GameSet/Language")
+            ControlGameSet.Refresh()
+        end
+)
+end
+

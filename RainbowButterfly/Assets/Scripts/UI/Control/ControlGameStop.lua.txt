@@ -1,0 +1,75 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/03/25 01:06:43
+
+ * 最后日期: 2022/03/25 01:07:07
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using 'LuaObjectPoolBuilder'
+using 'LuaSingletonItem'
+Script "WindowGameStop"
+
+-- 对象池对象
+ControlGameStop = LuaSingletonItem:Extend({
+    TableName = 'ControlGameStop'
+})
+ControlGameStop.pool = LuaObjectPoolBuilder.Construct(ControlGameStop)
+
+-- 获取对象
+function ControlGameStop.Get()
+    return ControlGameStop.pool:Get()
+end
+
+
+function ControlGameStop:ObjectOnNew()
+
+end
+
+
+function ControlGameStop:ObjectOnDestroy()
+
+end
+
+
+function ControlGameStop:ObjectOnGet()
+    self.view = WindowGameStop:Instance()
+
+    self.view.setBtn.onClick:AddListener(function()
+        ControlGameSet:Instance():Show()
+    end
+)
+    self.view.returnBtn.onClick:AddListener(function()
+        WindowManager.Instance():Close(self.view.window)
+    end
+)
+
+    self.view.returnMainBtn.onClick:AddListener(function()
+        GlobalAsset:Get("游戏流程状态机"):Set(StateMainMenu:Instance().focusState)
+    end
+)
+
+end
+
+
+function ControlGameStop:ObjectOnRecycle()
+    self.view.returnBtn.onClick:RemoveAllListeners()
+    self.view.setBtn.onClick:RemoveAllListeners()
+    self.view.returnMainBtn.onClick:RemoveAllListeners()
+    self.view:ObjectRecycle()
+    self.view = nil
+end
+
+function  ControlGameStop:Show()
+    WindowManager:Instance():Show(self.view.window)
+end
+
+
+function  ControlGameStop:Close()
+    WindowManager:Instance():Close(self.view.window)
+end

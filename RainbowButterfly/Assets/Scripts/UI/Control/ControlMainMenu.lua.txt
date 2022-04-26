@@ -1,0 +1,64 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/03/24 15:41:58
+
+ * 最后日期: 2022/03/24 15:42:31
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using 'LuaObjectPoolBuilder'
+using 'LuaSingletonItem'
+Script "WindowMain"
+Script "ControlGameSet"
+
+-- 对象池对象
+ControlMainMenu = LuaSingletonItem:Extend({TableName = 'ControlMainMenu'})
+ControlMainMenu.pool = LuaObjectPoolBuilder.Construct(ControlMainMenu)
+
+-- 获取对象
+function ControlMainMenu.Get() return ControlMainMenu.pool:Get() end
+
+function ControlMainMenu:ObjectOnNew() end
+
+function ControlMainMenu:ObjectOnDestroy() end
+
+function ControlMainMenu:ObjectOnGet()
+    self.view = WindowMain:Instance()
+
+    self.view.startBtn.onClick:AddListener(function()
+        GlobalAsset:Get("游戏流程状态机"):Set(
+            StatePlay:Instance().focusState)
+    end)
+    self.view.setBtn.onClick:AddListener(function()
+        ControlGameSet:Instance():Show()
+    end)
+
+    self.view.quitGame = function()
+        local windowConfirm = WindowConfirm.Get()
+        windowConfirm:Refresh(LanguageManager.Instance().Data:Get(
+                                  "提示/退出游戏确认"), function(bit)
+            if bit then Application.Quit() end
+        end)
+        WindowManager.Instance():Show(windowConfirm.window)
+    end
+
+end
+
+function ControlMainMenu:ObjectOnRecycle()
+    self.view.startBtn.onClick:RemoveAllListeners()
+    self.view.setBtn.onClick:RemoveAllListeners()
+    self.view.quitGame = nil
+    self.view:ObjectRecycle()
+    self.view = nil
+end
+
+function ControlMainMenu:Show() WindowManager:Instance():Show(self.view.window) end
+
+function ControlMainMenu:Close() WindowManager:Instance()
+    :Close(self.view.window) end
+

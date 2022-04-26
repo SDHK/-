@@ -1,0 +1,30 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/03/03 04:43:56
+
+ * 最后日期: 2022/03/03 04:46:00
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaMonoObjectItem"
+
+---@class BulletBase 子弹基类 Extend LuaMonoObjectItem
+---@field  weapon object 发射武器
+BulletBase = LuaMonoObjectItem:Extend({
+    TableName = "BulletBase",
+    startPosition = Vector3.zero,
+    weapon = nil,
+})
+
+function BulletBase:SetWeapon(weapon)
+    self.weapon = weapon
+end
+
+function BulletBase:Active()
+    self.gameObject:SetActive(true)
+end

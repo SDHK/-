@@ -1,0 +1,105 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/03/28 05:26:43
+
+ * 最后日期: 2022/03/28 05:27:40
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using 'LuaObjectPoolBuilder'
+using 'LuaSingletonItem'
+
+Script "ControlGameOver"
+Script "WindowGame"
+Script "ModelGame"
+Script "Level1"
+
+-- 对象池对象
+ControlGame = LuaSingletonItem:Extend({TableName = 'ControlGame'})
+ControlGame.pool = LuaObjectPoolBuilder.Construct(ControlGame)
+
+-- 获取对象
+function ControlGame.Get() return ControlGame.pool:Get() end
+
+function ControlGame:ObjectOnNew()
+    self.view = WindowGame:Instance()
+    self.layerPool = LayerPool:Instance()
+    self.languageManager = LanguageManager.Instance()
+    self.modelGame = ModelGame:Instance()
+
+end
+
+function ControlGame:SetAircraft(aircraft)
+    self.playerAircraft = aircraft
+    self.view:SetHp(self.playerAircraft.hp, self.playerAircraft.hpMax)
+
+    self.playerAircraft.OnHit = function()
+        self.view:Hit()
+        self.view:SetHp(self.playerAircraft.hp, self.playerAircraft.hpMax)
+
+    end
+
+    self.playerAircraft.OnRepair = function()
+        self.view:SetHp(self.playerAircraft.hp, self.playerAircraft.hpMax)
+    end
+
+    self.playerAircraft.OnDeath = function()
+        ControlGameOver:Instance():SetTitle("游戏结束")
+        ControlGameOver:Instance():Show()
+    end
+
+end
+
+function ControlGame:ObjectOnDestroy() end
+
+function ControlGame:ObjectOnGet()
+    self.view.updateCallBack = function() ControlGameStop:Instance():Show() end
+
+    self.playerAircraft = nil
+end
+
+function ControlGame:ObjectOnRecycle()
+    self.modelGame:ObjectRecycle()
+
+    self.view:ObjectRecycle()
+    self.view = nil
+end
+
+function ControlGame:Level(key)
+    self.modelGame.level = self.languageManager.Data:Get("Level", key) or
+                               ("Level/" .. key)
+    self.view:LevelShow(self.modelGame.level)
+end
+
+function ControlGame:Score(num)
+    self.modelGame.score = self.modelGame.score + num
+    self.view:ScoreShow(self.modelGame.score)
+end
+
+function ControlGame:Recycle()
+    self.modelGame.LevelStateMachine:Set(nil)
+    PlayerCamera:Instance():DoMove(Vector3.zero)
+    LayerPool:Instance():RecycleAllLayer()
+
+end
+
+function ControlGame:Show()
+
+    self.modelGame:Default()
+    self.modelGame.playerAircraft = AircraftButterfly.GetPlayerAircraft()
+    PlayerCamera:Instance()
+        :FollowTarget(self.modelGame.playerAircraft.transform) -- 相机跟随主角
+    self:SetAircraft(self.modelGame.playerAircraft) -- 主角UI事件绑定
+
+    self.modelGame.LevelStateMachine:Set(Level1.Get().focusState) -- 卡关启动
+
+    WindowManager:Instance():Show(self.view.window) -- 打开窗口
+end
+
+function ControlGame:Close() WindowManager:Instance():Close(self.view.window) end
+

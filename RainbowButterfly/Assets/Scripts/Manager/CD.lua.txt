@@ -1,0 +1,92 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/01/28 01:02:57
+
+ * 最后日期: 2022/01/28 01:04:28
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+
+--- 常量
+CD = {
+    TableName = "CD",
+    ------------------
+
+    PathGameData = "/GameData.PathData",
+    PathGameDataDefault = "/GameDataDefault.PathData",
+    PathInputKeysDefault = "/Inputkeys/InputKeysDataDefault.InputKeys",
+    PathInputKeys = "/Inputkeys/InputKeysData.InputKeys",
+    PathScreenResolutionDefault = "/ScreenResolution/DataDefault.ScreenResolution",
+    PathScreenResolution = "/ScreenResolution/Data.ScreenResolution",
+    ------------------
+    CanvasName = "WindowsCanvas",
+    Layer1 = 1,
+    Layer2 = 2,
+    Layer3 = 3,
+    Layer4 = 4,
+    Layer5 = 5,
+    Layer6 = 6,
+    WindowFadeSpeed = 0.3,
+    ------------------
+
+    ABpfb_ui = "pfb_ui",
+    ABpfb_aircraft = "pfb_aircraft",
+    ------------------
+    AB_MouseCursor = "MouseCursor",
+    AB_UICanvasBox = "UICanvasBox",
+    AB_WindowMain = "WindowMain",
+    AB_WindowArchive = "WindowArchive",
+    AB_WindowGame = "WindowGame",
+    AB_WindowGameStop = "WindowGameStop",
+    AB_WindowGameOver = "WindowGameOver",
+
+    AB_ArchiveBtn = "ArchiveBtn",
+    AB_WindowGameSet = "WindowGameSet",
+    AB_KeyToggle = "KeyToggle",
+    ------------------
+
+    AB_PageGameSet = "PageGameSet",
+    AB_PageKeyBind = "PageKeyBind",
+    AB_PageScreen = "PageScreen",
+    ------------------
+
+    AB_ScrollListKeyBind = "ScrollListKeyBind",
+    AB_ScrollListDropdown = "ScrollListDropdown",
+    AB_ScrollListToggle = "ScrollListToggle",
+    AB_ScrollListSlider = "ScrollListSlider",
+    AB_ScrollListButton = "ScrollListButton",
+    AB_ScrollListInputField = "ScrollListInputField",
+    ------------------
+
+    AB_WindowInput = "WindowInput",
+    AB_WindowLoad = "WindowLoad",
+    AB_WindowConfirm = "WindowConfirm",
+    AB_WindowMask = "WindowMask",
+    ------------------
+    AB_MainCamera = "MainCamera",
+    AB_UICamera = "UICamera",
+    AB_PlayerCamera = "PlayerCamera",
+    AB_Stars = "Stars",
+
+    ------------------
+
+   
+
+    ------------------
+
+    CanvasPlaneDistance = 100,
+    cursorAlphaMax = 1,
+    cursorAlphaMin = 0.5,
+    cursor1AlphaMax = 0.6,
+    cursor1AlphaMin = 0.3,
+    cursorRotationSpeedMax = 800,
+    cursorRotationSpeedMin = 200,
+    windowFadeSpeed = 0.5,
+    impactFlashIntensity = -10,
+    bulletFlashIntensity = -10
+}

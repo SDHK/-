@@ -1,0 +1,58 @@
+ManifestFileVersion: 0
+CRC: 4046339872
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: b5c5dc8fab0461aa70a6158c5c000026
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: c40fc9134546c9a865b9849cee382f5b
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 50
+  Script: {instanceID: 0}
+- Class: 58
+  Script: {instanceID: 0}
+- Class: 61
+  Script: {instanceID: 0}
+- Class: 68
+  Script: {instanceID: 0}
+- Class: 96
+  Script: {instanceID: 0}
+- Class: 120
+  Script: {instanceID: 0}
+- Class: 198
+  Script: {instanceID: 0}
+- Class: 199
+  Script: {instanceID: 0}
+- Class: 212
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetsPackage/GameObjects/Enemy/Body/Enemy003.prefab
+- Assets/AssetsPackage/GameObjects/_General/Bullet/EnemyBullet001.prefab
+- Assets/AssetsPackage/GameObjects/Enemy/Weapon/EnemyWeapon001.prefab
+- Assets/AssetsPackage/GameObjects/_General/Bullet/EnemyBulletLaser.prefab
+- Assets/AssetsPackage/GameObjects/_General/Explosion/ExplosionWave.prefab
+- Assets/AssetsPackage/GameObjects/Aircraft/Player/Weapon/Weapon.prefab
+- Assets/AssetsPackage/GameObjects/Stars.prefab
+- Assets/AssetsPackage/GameObjects/Aircraft/Player/PlayerAircraft.prefab
+- Assets/AssetsPackage/GameObjects/_General/Explosion/ExplosionFlash.prefab
+- Assets/AssetsPackage/GameObjects/_General/Explosion/ExplosionDebris.prefab
+- Assets/AssetsPackage/GameObjects/Enemy/Weapon/EnemyWeaponLaser.prefab
+- Assets/AssetsPackage/GameObjects/_General/Bullet/Bullet001.prefab
+- Assets/AssetsPackage/GameObjects/Enemy/Body/Enemy002.prefab
+- Assets/AssetsPackage/GameObjects/Enemy/Body/Enemy001.prefab
+- Assets/AssetsPackage/GameObjects/_General/Bullet/PlayerBulletLaser.prefab
+Dependencies:
+- E:/Make/GameEngine/Unity3D/2019_4_15f/2D/RainbowButterfly/Assets/AssetBundles/StandaloneWindows/material
+- E:/Make/GameEngine/Unity3D/2019_4_15f/2D/RainbowButterfly/Assets/AssetBundles/StandaloneWindows/pic_aircraft

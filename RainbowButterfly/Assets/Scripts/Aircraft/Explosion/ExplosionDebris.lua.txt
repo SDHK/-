@@ -1,0 +1,66 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/03/04 18:30:28
+
+ * 最后日期: 2022/03/04 18:30:59
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+
+using "LuaMonoObjectPoolBuilder"
+
+-- Mono对象池对象
+ExplosionDebris = LuaMonoObjectItem:Extend({TableName = "ExplosionDebris"})
+ExplosionDebris.pool =
+    LuaMonoObjectPoolBuilder.Construct(
+    ExplosionDebris,
+    GlobalAsset:Get(CD.ABpfb_aircraft, "ExplosionDebris", typeof(GameObject):ToString())
+)
+ExplosionDebris.pool.objectDestoryClock = 60
+ExplosionDebris.pool.objectDestoryIntervalClock = 1
+
+-- 获取对象
+function ExplosionDebris.Get()
+    return ExplosionDebris.pool:GetTable()
+end
+
+-- 获取对象，并设置父物体
+function ExplosionDebris.Get(parent)
+    return ExplosionDebris.pool:GetTable(parent)
+end
+function ExplosionDebris:Play(color,vector3)
+    self.material:SetColor("_Color", color)
+    self.transform.position = vector3
+    self.particle:Play()
+    self.clock:Run()
+end
+function ExplosionDebris:ObjectOnNew()
+    self.particle = self.gameObject:GetComponent(typeof(ParticleSystem))
+    self.material = self.gameObject:GetComponent(typeof(Renderer)).material
+    self.particleMian = self.particle.main
+end
+
+function ExplosionDebris:ObjectOnDestroy()
+end
+
+function ExplosionDebris:ObjectOnGet()
+    self.clock =
+        Clock.Get():Set(
+        self.particleMian.duration,
+        function()
+            self:ObjectRecycle()
+        end
+    )
+end
+
+function ExplosionDebris:ObjectOnRecycle()
+    self.clock:ObjectRecycle()
+end
+
+function ExplosionDebris:MonoUpdate()
+end

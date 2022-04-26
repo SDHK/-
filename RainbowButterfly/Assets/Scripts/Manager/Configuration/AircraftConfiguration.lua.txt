@@ -1,0 +1,128 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/03/19 00:14:55
+
+ * 最后日期: 2022/03/19 19:38:49
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+Script "AircraftButterfly"
+Script "AircraftFixedWing"
+
+AircraftConfiguration = LuaObject:Extend({
+    TableName = 'AircraftConfiguration'
+})
+
+function AircraftConfiguration.GetPool(table, assetPath)
+    local pool = LuaMonoObjectPoolBuilder.Construct(table,
+        GlobalAsset:Get(assetPath .. "/" .. typeof(GameObject):ToString()))
+    pool.objectDestoryClock = 600
+    return pool
+end
+
+
+AircraftConfiguration.playerList = ObjectList()
+AircraftConfiguration.enemyList = ObjectList()
+AircraftConfiguration.enemybulletList = ObjectList()
+AircraftConfiguration.playerbulletList = ObjectList()
+
+LayerPool:Instance():AddRelation("Player", "Enemy", "Aircraft")
+LayerPool:Instance():AddRelation("Player", "EnemyBullet", "Bullet")
+LayerPool:Instance():AddRelation("Enemy", "PlayerBullet", "Bullet")
+
+AircraftConfiguration.dropOffset = 0
+AircraftConfiguration.interval = Mathf.PI * 2 / 360
+function AircraftConfiguration.Drop(monoTable)
+    local radius = 200
+    -- local randomV2 = Random.insideUnitCircle.normalized * radius -- 随机位置
+    AircraftConfiguration.dropOffset = AircraftConfiguration.dropOffset + 1
+    local timeOffset = AircraftConfiguration.interval * AircraftConfiguration.dropOffset
+
+    local randomV2 = Vector2(Mathf.Sin(Time.time + timeOffset), Mathf.Cos(Time.time + timeOffset)) * radius
+
+    local layerPool = LayerPool:Instance()
+        :GetRelationPool(LayerMask.LayerToName(monoTable.gameObject.layer), "Aircraft")
+
+    if layerPool.Count > 0 then
+
+        return Vector3(randomV2.x, randomV2.y, 0) + layerPool[0].transform.position
+    else
+        return Vector3.zero
+    end
+end
+
+
+AircraftButterfly.Player = AircraftConfiguration.GetPool(AircraftButterfly, CD.ABpfb_aircraft .. "/PlayerAircraft")
+
+function AircraftButterfly.GetPlayerAircraft()
+    local aircraft = AircraftButterfly.Player:GetTable()
+    aircraft.transform.position = AircraftConfiguration.Drop(aircraft)
+    aircraft.hpMax = 100
+    aircraft.hp = 100
+    aircraft.speed = 100
+    aircraft.collisionDamage = 10
+    -- aircraft:AddWeapon(Weapon001.GetPlayerWeapon())
+    aircraft:AddWeapon(WeaponLaser.GetPlayerWeapon())
+    aircraft:SetControl(PlayerControl:Get())
+
+    return aircraft
+end
+
+
+AircraftFixedWing.EnemyChase = AircraftConfiguration.GetPool(AircraftFixedWing, CD.ABpfb_aircraft .. "/Enemy001")
+function AircraftFixedWing.GetEnemyChase()
+    local aircraft = AircraftFixedWing.EnemyChase:GetTable()
+    aircraft.transform.position = AircraftConfiguration.Drop(aircraft)
+    aircraft.score = 100
+
+    aircraft.hpMax = 20
+    aircraft.hp = 20
+    aircraft.speed = 150
+    aircraft.rotationSpeed = 5
+    aircraft.collisionDamage = 10
+
+    aircraft:SetControl(ControlDefault:Get())
+
+    return aircraft
+end
+
+
+AircraftFixedWing.EnemyGunner = AircraftConfiguration.GetPool(AircraftFixedWing, CD.ABpfb_aircraft .. "/Enemy002")
+function AircraftFixedWing.GetEnemyGunner()
+    local aircraft = AircraftFixedWing.EnemyGunner:GetTable()
+    aircraft.transform.position = AircraftConfiguration.Drop(aircraft)
+    aircraft.score = 150
+    aircraft.hpMax = 20
+    aircraft.hp = 20
+    aircraft.speed = 150
+    aircraft.rotationSpeed = 5
+    aircraft.collisionDamage = 10
+
+    aircraft:AddWeapon(Weapon001.GetEnemyWeapon001())
+    aircraft:SetControl(ControlDefault:Get())
+
+    return aircraft
+end
+
+
+AircraftFixedWing.EnemyLaser = AircraftConfiguration.GetPool(AircraftFixedWing, CD.ABpfb_aircraft .. "/Enemy003")
+function AircraftFixedWing.GetEnemyLaser()
+    local aircraft = AircraftFixedWing.EnemyLaser:GetTable()
+    aircraft.transform.position = AircraftConfiguration.Drop(aircraft)
+    aircraft.score = 200
+    aircraft.hpMax = 40
+    aircraft.hp = 40
+    aircraft.speed = 150
+    aircraft.rotationSpeed = 5
+    aircraft.collisionDamage = 10
+
+    aircraft:AddWeapon(WeaponLaser.GetEnemyWeapon())
+    aircraft:SetControl(ControlDefault:Get())
+
+    return aircraft
+end

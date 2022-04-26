@@ -1,0 +1,96 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/01/28 21:49:53
+
+ * 最后日期: 2022/03/03 16:52:21
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/01/28 01:18:05
+
+ * 最后日期: 2022/01/28 01:20:47
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaMonoObjectPoolBuilder"
+using "LuaMonoSingletonItem"
+Script "CD"
+
+-- Mono对象池对象
+MouseCursor = LuaMonoSingletonItem:Extend({
+    TableName = "MouseCursor"
+})
+
+MouseCursor.pool = LuaMonoObjectPoolBuilder.Construct(MouseCursor, GlobalAsset:Get(CD.ABpfb_ui, CD.AB_MouseCursor,
+    typeof(GameObject):ToString()))
+
+MouseCursor.cursor0 = nil
+MouseCursor.cursor1 = nil
+MouseCursor.cursor2 = nil
+MouseCursor.speed = 0
+
+-- 获取对象
+function MouseCursor.Get()
+    local parent = CanvasServer.Instance():GetLayer(CD.Layer6, CD.CanvasName)
+    return MouseCursor.pool:GetTable(parent)
+end
+
+function MouseCursor:ObjectOnNew()
+    self.inputKeysManager = InputKeysManager.Instance()
+end
+
+
+function MouseCursor:ObjectOnGet()
+    Cursor.visible = false
+
+    self.transform.localScale = Vector3.one
+    self.transform.eulerAngles = Vector3.zero
+
+    self.cursor0 = self.gameObject:SetComponent(typeof(Image))
+    self.cursor1 = self.gameObject:SetComponent(typeof(Image), "Cursor1")
+    self.cursor2 = self.gameObject:SetComponent(typeof(Image), "Cursor2")
+
+    self.speed = CD.cursorRotationSpeedMin
+end
+
+function MouseCursor:ObjectOnRecycle()
+    self.cursor0 = nil
+    self.cursor1 = nil
+    self.cursor2 = nil
+    self.speed = 0
+end
+
+
+function MouseCursor:MonoUpdate()
+    local mousePosition = Input.mousePosition
+    mousePosition.z = CD.CanvasPlaneDistance
+    -- self.transform.localPosition = Camera.main:ScreenToWorldPoint(mousePosition)
+    self.transform.position = Camera.main:ScreenToWorldPoint(mousePosition)
+    if Input.GetKeyDown(KeyCode.Mouse0) or self.inputKeysManager:GetKeysDown("游戏控制", "开火") then
+        self.cursor0.color = self.cursor0.color:A(CD.cursorAlphaMax)
+        self.cursor1.color = self.cursor1.color:A(CD.cursor1AlphaMax)
+        self.cursor2.color = self.cursor2.color:A(CD.cursor1AlphaMax)
+        self.speed = CD.cursorRotationSpeedMax
+    end
+    if Input.GetKeyUp(KeyCode.Mouse0) or self.inputKeysManager:GetKeysUp("游戏控制", "开火") then
+        self.cursor0.color = self.cursor0.color:A(CD.cursorAlphaMin)
+        self.cursor1.color = self.cursor1.color:A(CD.cursor1AlphaMin)
+        self.cursor2.color = self.cursor2.color:A(CD.cursor1AlphaMin)
+        self.speed = CD.cursorRotationSpeedMin
+    end
+    self.cursor1.transform:Rotate((-Vector3.forward * Time.unscaledDeltaTime * self.speed))
+    self.cursor2.transform:Rotate((Vector3.forward * Time.unscaledDeltaTime * self.speed))
+end
+

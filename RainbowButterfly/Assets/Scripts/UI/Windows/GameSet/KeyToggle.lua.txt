@@ -1,0 +1,68 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/10 21:35:02
+
+ * 最后日期: 2022/02/10 21:35:39
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaMonoObjectPoolBuilder"
+
+-- Mono对象池对象
+KeyToggle = LuaMonoObjectItem:Extend({TableName = "KeyToggle"})
+KeyToggle.pool =
+    LuaMonoObjectPoolBuilder.Construct(
+    KeyToggle,
+    GlobalAsset:Get(CD.ABpfb_ui, CD.AB_KeyToggle, typeof(GameObject):ToString())
+)
+
+KeyToggle.pool.objectDestoryClock = 600
+
+-- 获取对象
+function KeyToggle.Get()
+    return KeyToggle.pool:GetTable()
+end
+
+-- 获取对象，并设置父物体
+function KeyToggle.Get(parent)
+    return KeyToggle.pool:GetTable(parent)
+end
+
+function KeyToggle:ObjectOnNew()
+    local gameObject = self.gameObject
+
+    self.toggle = gameObject:SetComponent(typeof(Toggle))
+    self.keyToggleText = self.toggle.gameObject:SetComponent(typeof(LanguageText), "Text")
+
+    self.ToggleCallBack = function(bit)
+        if bit then
+            self.callBack(self.key)
+        end
+    end
+
+    self.toggle.onValueChanged:AddListener(self.ToggleCallBack)
+end
+
+function KeyToggle:ObjectOnDestroy()
+end
+
+function KeyToggle:ObjectOnGet()
+    self.transform:Default()
+end
+
+function KeyToggle:ObjectOnRecycle()
+    self.toggle.group = nil
+    self.toggle.isOn = false
+end
+
+
+function KeyToggle:Refresh(callBack, key)
+    self.callBack = callBack
+    self.key = key
+    self.keyToggleText:SetPath("按键绑定页面/" .. key)
+end

@@ -1,0 +1,120 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/03/06 17:02:35
+
+ * 最后日期: 2022/03/06 17:02:57
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaMonoObjectPoolBuilder"
+using "LuaMonoSingletonItem"
+using "LuaWindowBuilder"
+Script "ControlGameStop"
+
+-- Mono对象池对象
+WindowGame = LuaMonoSingletonItem:Extend({TableName = "WindowGame"})
+WindowGame.pool = LuaMonoObjectPoolBuilder.Construct(WindowGame,
+                                                     GlobalAsset:Get(
+                                                         CD.ABpfb_ui,
+                                                         CD.AB_WindowGame,
+                                                         typeof(GameObject):ToString()))
+
+WindowGame.pool.objectDestoryClock = 600
+WindowGame.pool.objectLimit = 1
+
+-- 获取对象
+function WindowGame.Get() return WindowGame.pool:GetTable() end
+
+-- 获取对象，并设置父物体
+function WindowGame.Get(parent) return WindowGame.pool:GetTable(parent) end
+
+-- function WindowGame:SetAircraft(aircraft)
+--     self.aircraft = aircraft
+--     self.aircraft.OnHit = function()
+--         self:Hit()
+--     end
+
+-- end
+
+function WindowGame:ObjectOnNew()
+    self.inputKeysManager = InputKeysManager.Instance()
+    self.window = LuaWindowBuilder.Construct(self)
+
+    local gameObject = self.gameObject
+
+    self.canvasGroup = gameObject:SetComponent(typeof(CanvasGroup))
+    self.canvasGroup.alpha = 0
+    self.canvasGroup.interactable = false
+
+    self.aircraft = nil
+    self.hp = gameObject:SetComponent(typeof(Image), "HP")
+    self.hit = gameObject:SetComponent(typeof(Image), "Hit")
+
+    self.levelGroup = gameObject:SetComponent(typeof(CanvasGroup), "Level")
+    self.levelText = self.levelGroup.gameObject:SetComponent(typeof(Text),
+                                                             "Text")
+    self.Score = gameObject:SetComponent(typeof(Text), "Score")
+
+    self.updateCallBack = nil
+    -- !boss血量
+    -- !雷达
+    -- !背景
+end
+
+function WindowGame:SetHp(hp, hpMax) self.hp.fillAmount = hp / hpMax end
+
+function WindowGame:Hit()
+    self.hit:DOFade(1, 0.1):OnComplete(function() self.hit:DOFade(0, 2) end)
+end
+
+function WindowGame:LevelShow(str)
+    self.levelText.text = str
+    self.levelGroup:DOFade(1, 2):OnComplete(function()
+        self.levelGroup:DOFade(0, 2)
+    end)
+end
+function WindowGame:ScoreShow(num)
+    self.Score.text = num
+end
+function WindowGame:ObjectOnDestroy() end
+
+function WindowGame:ObjectOnGet()
+
+    local transform = self.transform
+    transform:SetParent(CanvasServer.Instance():GetLayer(CD.Layer1, ""))
+    transform:GetRectTransform():RectAllStretch()
+    transform:Default()
+end
+
+function WindowGame:ObjectOnRecycle() end
+
+function WindowGame:WaitFocusStateEnter(EnterDone)
+    self.canvasGroup:DOFade(1, CD.WindowFadeSpeed):SetUpdate(true):OnComplete(
+        function()
+            EnterDone()
+            self.canvasGroup.interactable = true
+        end)
+end
+
+function WindowGame:WaitFocusStateExit(ExitDone)
+    self.canvasGroup.interactable = false
+    self.canvasGroup:DOFade(0, CD.WindowFadeSpeed):SetUpdate(true):OnComplete(
+        function() ExitDone() end)
+end
+
+function WindowGame:StackStateEnter()
+    self.Score.text = "0"
+end
+
+function WindowGame:FocusStateUpdate()
+
+    if self.inputKeysManager:GetKeysDown("界面快捷键", "返回") then
+        if self.updateCallBack then self.updateCallBack() end
+    end
+end
+

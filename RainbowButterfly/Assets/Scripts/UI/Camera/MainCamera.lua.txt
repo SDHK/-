@@ -1,0 +1,75 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/13 23:38:20
+
+ * 最后日期: 2022/04/02 10:40:49
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/13 23:38:20
+
+ * 最后日期: 2022/02/13 23:38:41
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaMonoObjectPoolBuilder"
+using "LuaMonoSingletonItem"
+
+Script "UICanvas"
+Script "PlayerCamera"
+Script "MouseCursor"
+Script "Stars"
+
+-- Mono对象池对象
+MainCamera = LuaMonoSingletonItem:Extend({TableName = "MainCamera"})
+MainCamera.pool = LuaMonoObjectPoolBuilder.Construct(MainCamera,
+                                                     GlobalAsset:Get(
+                                                         CD.ABpfb_ui,
+                                                         CD.AB_MainCamera,
+                                                         typeof(GameObject):ToString()))
+
+MainCamera.pool.objectLimit = 1
+
+-- 获取对象
+function MainCamera.Get() return MainCamera.pool:GetTable() end
+
+-- 获取对象，并设置父物体
+function MainCamera.Get(parent) return MainCamera.pool:GetTable(parent) end
+
+function MainCamera:ObjectOnNew()
+    self.cameraStack = self.mono:GetComponent(typeof(
+                                                  UniversalAdditionalCameraData))
+                           .cameraStack
+
+    local uiCanvas = UICanvas:Instance()
+    local playerCamera = PlayerCamera:Instance()
+
+    self.cameraStack:Add(playerCamera.camera)
+    self.cameraStack:Add(uiCanvas.camera)
+
+    local stars = Stars:Instance()
+    stars.transform:SetParent(playerCamera.transform)
+    -- 鼠标光标单例
+    local mouseCursor = MouseCursor:Instance()
+
+end
+
+function MainCamera:ObjectOnDestroy() end
+
+function MainCamera:ObjectOnGet() end
+
+function MainCamera:ObjectOnRecycle() end
+
+function MainCamera:MonoUpdate() end

@@ -1,0 +1,73 @@
+ManifestFileVersion: 0
+CRC: 1530356230
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: cb45068ff510993c245764c338276ae3
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 5ad585dd02dfb5016c0dad519eab8f49
+HashAppended: 0
+ClassTypes:
+- Class: 49
+  Script: {instanceID: 0}
+Assets:
+- Assets/Scripts/UI/Control/ControlMainMenu.lua.txt
+- Assets/Scripts/UI/Windows/WindowMain.lua.txt
+- Assets/Scripts/UI/Windows/GameSet/PageGameSet.lua.txt
+- Assets/Scripts/Manager/Configuration/BulletConfiguration.lua.txt
+- Assets/Scripts/Aircraft/Weapon/Weapon001.lua.txt
+- Assets/Scripts/UI/Windows/Game/WindowGame.lua.txt
+- Assets/Scripts/Control/Strategy/StrategyOrbit.lua.txt
+- Assets/Scripts/UI/Control/ControlGameStop.lua.txt
+- Assets/Scripts/UI/Control/ControlGameSet.lua.txt
+- Assets/Scripts/UI/UICanvas.lua.txt
+- Assets/Scripts/Aircraft/Sub/AircraftFixedWing.lua.txt
+- Assets/Scripts/State/StateGameStop.lua.txt
+- Assets/Scripts/Manager/LayerPool.lua.txt
+- Assets/Scripts/UI/Windows/GameStop/WindowGameStop.lua.txt
+- Assets/Scripts/Aircraft/Bullet/BulletLaser.lua.txt
+- Assets/Scripts/UI/Windows/GameSet/ScrollList/ScrollListButton.lua.txt
+- Assets/Scripts/Control/Strategy/StrategyImpact.lua.txt
+- Assets/Scripts/Control/Strategy/Weapon/StrategyIntervalShot.lua.txt
+- Assets/Scripts/Aircraft/Explosion/ExplosionDebris.lua.txt
+- Assets/Scripts/UI/Camera/Stars.lua.txt
+- Assets/Scripts/Aircraft/Bullet/Bullet001.lua.txt
+- Assets/Scripts/UI/Windows/GameSet/ScrollList/ScrollListDropdownString.lua.txt
+- Assets/Scripts/State/StatePlay.lua.txt
+- Assets/Scripts/Control/ControlDefault.lua.txt
+- Assets/Scripts/Manager/CD.lua.txt
+- Assets/Scripts/Model/Level1.lua.txt
+- Assets/Scripts/Aircraft/Explosion/ExplosionFlash.lua.txt
+- Assets/Scripts/Aircraft/Weapon/WeaponLaser.lua.txt
+- Assets/Scripts/Control/Strategy/Base/StrategyBase.lua.txt
+- Assets/Scripts/Aircraft/Sub/AircraftButterfly.lua.txt
+- Assets/Scripts/UI/Camera/PlayerCamera.lua.txt
+- Assets/Scripts/UI/Windows/GameOver/WindowGameOver.lua.txt
+- Assets/Scripts/Manager/LuaMain.lua.txt
+- Assets/Scripts/UI/Control/ControlGame.lua.txt
+- Assets/Scripts/State/StateMainMenu.lua.txt
+- Assets/Scripts/Aircraft/Weapon/Base/WeaponBase.lua.txt
+- Assets/Scripts/UI/Control/ControlGameOver.lua.txt
+- Assets/Scripts/UI/GeneralWindows/WindowClock.lua.txt
+- Assets/Scripts/Aircraft/Bullet/BulletBase.lua.txt
+- Assets/Scripts/UI/Windows/GameSet/ScrollList/ScrollListInputField.lua.txt
+- Assets/Scripts/UI/Windows/GameSet/PageKeyBind.lua.txt
+- Assets/Scripts/UI/Windows/GameSet/ScrollList/ScrollListKeyBind.lua.txt
+- Assets/Scripts/Control/Base/ControlBase.lua.txt
+- Assets/Scripts/UI/Windows/GameSet/PageScreen.lua.txt
+- Assets/Scripts/Aircraft/Explosion/ExplosionWave.lua.txt
+- Assets/Scripts/UI/GeneralWindows/WindowMask.lua.txt
+- Assets/Scripts/UI/Camera/MainCamera.lua.txt
+- Assets/Scripts/UI/Windows/GameSet/WindowGameSet.lua.txt
+- Assets/Scripts/UI/GeneralWindows/WindowConfirm.lua.txt
+- Assets/Scripts/UI/Windows/GameSet/ScrollList/ScrollListToggle.lua.txt
+- Assets/Scripts/UI/Input/MouseCursor.lua.txt
+- Assets/Scripts/Control/PlayerControl.lua.txt
+- Assets/Scripts/Aircraft/AircraftBase.lua.txt
+- Assets/Scripts/Model/ModelGame.lua.txt
+- Assets/Scripts/UI/Windows/GameSet/KeyToggle.lua.txt
+- Assets/Scripts/Manager/Configuration/AircraftConfiguration.lua.txt
+- Assets/Scripts/Manager/Configuration/WeaponConfiguration.lua.txt
+- Assets/Scripts/UI/Windows/GameSet/ScrollList/ScrollListDropdownEnum.lua.txt
+Dependencies: []

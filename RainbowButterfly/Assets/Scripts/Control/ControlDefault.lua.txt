@@ -1,0 +1,35 @@
+﻿
+--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/03/12 16:45:49
+
+ * 最后日期: 2022/03/12 16:46:21
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]]--------------------
+
+using 'LuaObjectPoolBuilder'
+
+Script "ControlBase"
+
+-- 对象池对象
+ControlDefault = ControlBase:Extend({ TableName = 'ControlDefault'})
+ControlDefault.pool = LuaObjectPoolBuilder.Construct(ControlDefault)
+ControlDefault.pool.objectDestoryClock = 600
+
+
+-- 获取对象
+function ControlDefault.Get()
+    return ControlDefault.pool:Get()
+end
+
+
+
+function ControlDefault:FocusStateExit()
+    self:ObjectRecycle()
+end

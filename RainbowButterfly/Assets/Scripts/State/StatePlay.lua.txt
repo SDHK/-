@@ -1,0 +1,61 @@
+﻿
+--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/15 19:50:58
+
+ * 最后日期: 2022/03/30 07:28:51
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]]--------------------
+
+using "LuaObjectPoolBuilder"
+using "LuaSingletonItem"
+using "LuaFocusStateBuilder"
+
+Script "ControlGame"
+
+-- 对象池对象
+StatePlay = LuaSingletonItem:Extend({TableName = "StatePlay"})
+StatePlay.pool = LuaObjectPoolBuilder.Construct(StatePlay)
+
+-- 获取对象
+function StatePlay.Get()
+    return StatePlay.pool:Get()
+end
+
+function StatePlay:ObjectOnNew()
+
+    self.focusState = LuaFocusStateBuilder.Construct(self)
+end
+
+function StatePlay:ObjectOnDestroy()
+    self.focusState = nil
+end
+
+function StatePlay:WaitFocusStateEnter(EnterDone)
+    local asyncOperation = SceneManager.LoadSceneAsync("Game")
+    asyncOperation:completed(
+        "+",
+        function(Operation)
+            EnterDone()
+        end
+    )
+end
+function StatePlay:FocusStateEnter()
+    print("StatePlay进入！")
+    ControlGame:Instance():Show()
+end
+
+function StatePlay:FocusStateExit()
+    print("StatePlay退出！")
+   
+    ControlGame:Instance():Recycle()
+    WindowManager.Instance():Clear()
+end
+
+

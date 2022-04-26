@@ -1,0 +1,86 @@
+﻿
+--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/03/19 19:31:32
+
+ * 最后日期: 2022/03/19 19:31:49
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]]--------------------
+
+using 'LuaObjectPoolBuilder'
+
+Script "AircraftBase"
+Script "LayerPool"
+Script "ExplosionWave"
+Script "ExplosionDebris"
+-- 对象池对象
+AircraftButterfly = AircraftBase:Extend({ TableName = 'AircraftButterfly'})
+
+
+function AircraftButterfly:ObjectOnNew()
+
+    self.weaponList={}
+
+    self.rigidbody2D = self.gameObject:GetComponent(typeof(Rigidbody2D))
+
+    self.coreColor = self.gameObject:SetComponent(typeof(SpriteRenderer), "Core").color
+    self.bodyColor = self.gameObject:SetComponent(typeof(SpriteRenderer), "Body").color
+end
+
+
+function AircraftButterfly:ObjectOnDestroy()
+    self.rigidbody2D = nil
+end
+
+
+function AircraftButterfly:ObjectOnGet()
+    self:Default()
+
+    self.controlMachine = FocusStateMachine.Get()
+    LayerPool:Instance():Add(self)
+
+end
+
+
+function AircraftButterfly:ObjectOnRecycle()
+
+    self.controlMachine:Set(nil)
+    self.controlMachine:ObjectRecycle()
+    self.controlMachine = nil
+    self:Default()
+    LayerPool:Instance():Remove(self)
+
+end
+
+
+
+
+function AircraftButterfly:MonoFixedUpdate()
+    local moveDirection = (self.movePosition - self.transform.position)
+    local moveDirection2D = Vector2(moveDirection.x, moveDirection.y)
+
+    self.rigidbody2D:AddForce(moveDirection2D.normalized * self.speed * Mathf.Clamp01(moveDirection2D.magnitude))
+
+    local targetVector = self.targetPosition - self.transform.position
+    self.rigidbody2D:MoveRotation(Mathf.Atan2(targetVector.x, targetVector.y) * -Mathf.Rad2Deg)
+end
+
+
+function AircraftButterfly:Death()
+    ExplosionWave.Get():Play(self.coreColor, self.transform.position)
+    ExplosionDebris.Get():Play(self.bodyColor, self.transform.position)
+    self:ObjectRecycle()
+end
+
+function AircraftButterfly:MonoOnCollisionEnter2D(collision2D)
+    if collision2D.gameObject.tag == "Aircraft" then
+        collision2D.gameObject:GetComponent(typeof(LuaMonoObject)).table:Hit(self.collisionDamage)
+        ExplosionFlash.Get():Play(CD.impactFlashIntensity, self.transform.position)
+    end
+end

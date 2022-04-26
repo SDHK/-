@@ -1,0 +1,74 @@
+﻿
+--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/01/28 21:49:53
+
+ * 最后日期: 2022/01/29 00:44:44
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+
+using "LuaObjectPoolBuilder"
+using "LuaSingletonItem"
+using "LuaFocusStateBuilder"
+Script "ControlMainMenu"
+
+Script "StatePlay"
+Script "StateGameStop"
+
+-- 对象池对象
+StateMainMenu =
+    LuaSingletonItem:Extend(
+    {
+        TableName = "StateMainMenu"
+    }
+)
+StateMainMenu.pool = LuaObjectPoolBuilder.Construct(StateMainMenu)
+
+StateMainMenu.pool.objectLimit = 1
+
+-- 获取对象
+function StateMainMenu.Get()
+    return StateMainMenu.pool:Get()
+end
+
+function StateMainMenu:ObjectOnNew()
+    self.focusState = LuaFocusStateBuilder.Construct(self)
+end
+
+function StateMainMenu:ObjectOnDestroy()
+    self.focusState = nil
+end
+
+
+function StateMainMenu:WaitFocusStateEnter(EnterDone)
+    local asyncOperation = SceneManager.LoadSceneAsync("GameMenu")
+
+    asyncOperation:completed(
+        "+",
+        function(Operation)
+            EnterDone()
+        end
+    )
+end
+
+function StateMainMenu:FocusStateEnter()
+    print("StateMainMenu进入！")
+
+
+    ControlMainMenu:Instance():Show()
+
+    -- WindowManager.Instance():Show(WindowMain.Get().window)
+end
+
+function StateMainMenu:FocusStateExit()
+    print("StateMainMenu退出！")
+
+    WindowManager.Instance():Clear()
+
+end

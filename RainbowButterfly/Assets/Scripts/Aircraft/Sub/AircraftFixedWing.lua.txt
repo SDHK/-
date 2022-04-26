@@ -1,0 +1,89 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/03/19 21:44:28
+
+ * 最后日期: 2022/03/19 21:46:34
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using 'LuaMonoObjectPoolBuilder'
+Script "AircraftBase"
+Script "ExplosionWave"
+Script "ExplosionDebris"
+-- Mono对象池对象
+AircraftFixedWing = AircraftBase:Extend({
+    TableName = 'AircraftFixedWing'
+})
+
+function AircraftFixedWing:ObjectOnNew()
+
+    self.weaponList={}
+
+    self.rigidbody2D = self.gameObject:GetComponent(typeof(Rigidbody2D))
+
+    self.coreColor = self.gameObject:SetComponent(typeof(SpriteRenderer), "Core").color
+    self.bodyColor = self.gameObject:SetComponent(typeof(SpriteRenderer), "Body").color
+end
+
+
+function AircraftFixedWing:ObjectOnDestroy()
+
+end
+
+
+function AircraftFixedWing:ObjectOnGet()
+    self:Default()
+
+    self.controlMachine = FocusStateMachine.Get()
+    LayerPool:Instance():Add(self)
+
+end
+
+
+function AircraftFixedWing:ObjectOnRecycle()
+    
+    self.controlMachine:Set(nil)
+    self.controlMachine:ObjectRecycle()
+    self.controlMachine = nil
+    self:Default()
+    LayerPool:Instance():Remove(self)
+
+end
+
+
+function AircraftFixedWing:MonoFixedUpdate()
+    local moveDirection = (self.movePosition - self.transform.position)
+    local moveDirection2D = Vector2(moveDirection.x, moveDirection.y)
+
+    self.rigidbody2D:AddForce(moveDirection2D.normalized * self.speed * Mathf.Clamp01(moveDirection2D.magnitude))
+
+    if moveDirection2D.magnitude > 0.1 then
+        self.rigidbody2D:MoveRotation(Mathf.LerpAngle(self.transform.eulerAngles.z, Mathf.Atan2(moveDirection2D.x,
+            moveDirection2D.y) * -Mathf.Rad2Deg, Time.fixedDeltaTime * self.rotationSpeed))
+    end
+
+    for key, value in pairs(self.weaponList) do
+        value.targetPosition = self.targetPosition
+    end
+end
+
+
+function AircraftFixedWing:MonoOnCollisionEnter2D(collision2D)
+    if collision2D.gameObject.tag == "Aircraft" then
+        collision2D.gameObject:GetComponent(typeof(LuaMonoObject)).table:Hit(self.collisionDamage)
+        ExplosionFlash.Get():Play(CD.impactFlashIntensity, collision2D.transform.position)
+    end
+end
+
+function AircraftFixedWing:Death()
+
+    ExplosionWave.Get():Play(self.coreColor, self.transform.position)
+    ExplosionDebris.Get():Play(self.bodyColor, self.transform.position)
+    self:ObjectRecycle()
+end
+

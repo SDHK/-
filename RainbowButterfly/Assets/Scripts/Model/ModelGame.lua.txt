@@ -1,0 +1,71 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/03/08 09:00:54
+
+ * 最后日期: 2022/03/29 16:47:37
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaObjectPoolBuilder"
+using "LuaSingletonItem"
+
+-- 对象池对象
+ModelGame = LuaSingletonItem:Extend({
+    TableName = "ModelGame"
+})
+ModelGame.pool = LuaObjectPoolBuilder.Construct(ModelGame)
+
+-- 获取对象
+function ModelGame.Get()
+    return ModelGame.pool:Get()
+end
+
+
+function ModelGame:ObjectOnNew()
+    self.LevelStateMachine = FocusStateMachine.Get()
+    self.languageManager = LanguageManager.Instance()
+    self.layerPool = LayerPool:Instance()
+end
+
+
+function ModelGame:ObjectOnDestroy()
+end
+
+
+function ModelGame:ObjectOnGet()
+    self:Default()
+end
+
+
+function ModelGame:Default()
+    self.playerAircraft = nil
+    self.level = ""
+    self.score = 0
+end
+
+
+-- function ModelGame:Initialize()
+
+-- local playerAircraft = AircraftButterfly.GetPlayerAircraft()
+-- PlayerCamera:Instance():FollowTarget(playerAircraft.transform) -- 相机跟随主角
+
+-- ControlGame:Instance():SetAircraft(playerAircraft) -- 主角面板UI
+-- ControlGame:Instance():Show()
+
+-- self.LevelStateMachine:Set(Level1.Get().focusState)
+
+-- end
+
+function ModelGame:ObjectOnRecycle()
+    self.LevelStateMachine:Set(nil)
+    -- LayerPool:Instance():RecycleAllLayer()
+
+    -- PlayerCamera:Instance():DoMove(Vector3.zero)
+end
+
+

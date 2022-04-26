@@ -1,0 +1,96 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/17 21:24:24
+
+ * 最后日期: 2022/02/17 21:26:55
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaMonoObjectPoolBuilder"
+
+Script "WeaponBase"
+
+-- Mono对象池对象
+Weapon001 = WeaponBase:Extend({TableName = "Weapon001"})
+
+function Weapon001:ObjectOnNew()
+    self.spriteRenderer = self.gameObject:SetComponent(typeof(SpriteRenderer))
+    self.fireClock = Clock.Get()
+end
+
+function Weapon001:ObjectOnDestroy() self.fireClock:ObjectRecycle() end
+
+function Weapon001:ObjectOnGet()
+    self.transform.localEulerAngles = Vector3.zero
+    self.transform.localPosition = Vector3.zero
+
+    self.fireClock.callBack = function()
+        if self.isFire then
+            self.fireClock:Run()
+            self:BuildBullet()
+        end
+    end
+
+end
+
+function Weapon001:Fire()
+    self.isFire = true
+    self.spriteRenderer.color = self.spriteRenderer.color:A(1)
+    self.fireClock.time = self.interval
+
+    if not self.fireClock.isRun then
+        self.fireClock:Run()
+        self:BuildBullet()
+    end
+end
+
+function Weapon001:CeaseFire()
+    self.isFire = false
+    self.spriteRenderer.color = self.spriteRenderer.color:A(0.5)
+end
+
+function Weapon001:ObjectOnRecycle()
+    self.isFire = false
+    self.fireClock:Stop()
+end
+
+function Weapon001:BuildBullet()
+    if self.multiple > 1 then
+
+        for i = 0, self.multiple - 1, 1 do
+            local localAngle = self.diffusion / (self.multiple - 1) * i
+            local angle = localAngle - self.diffusion * 0.5
+
+            local eulerAngle = self.transform.eulerAngles
+            eulerAngle.z = eulerAngle.z + angle
+
+            local position = self.transform.position + self.transform.up * 2
+
+            self:GetBullet(position, eulerAngle)
+        end
+
+    elseif self.multiple == 1 then
+
+        local randomAngle = Random.Range(0, self.diffusion)
+
+        local eulerAngle = self.transform.eulerAngles
+        eulerAngle.z = eulerAngle.z + (randomAngle - self.diffusion * 0.5)
+        local position = self.transform.position + self.transform.up * 2
+        self:GetBullet(position, eulerAngle)
+    end
+
+end
+
+function Weapon001:GetBullet(position, eulerAngle)
+    local bullet = self.bulletGet()
+    bullet:SetWeapon(self)
+    bullet.transform.position = position
+    bullet.transform.eulerAngles = eulerAngle
+    bullet:Active()
+end
+

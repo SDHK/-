@@ -1,0 +1,105 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/03/29 16:23:24
+
+ * 最后日期: 2022/03/29 16:23:39
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using 'LuaMonoObjectPoolBuilder'
+using 'LuaMonoSingletonItem'
+
+-- Mono对象池对象
+WindowGameOver = LuaMonoSingletonItem:Extend({
+    TableName = 'WindowGameOver'
+})
+WindowGameOver.pool = LuaMonoObjectPoolBuilder.Construct(WindowGameOver, GlobalAsset:Get(CD.ABpfb_ui,
+    CD.AB_WindowGameOver, typeof(GameObject):ToString()))
+
+-- 获取对象
+function WindowGameOver.Get()
+    return WindowGameOver.pool:GetTable()
+end
+
+
+-- 获取对象，并设置父物体
+function WindowGameOver.Get(parent)
+    return WindowGameOver.pool:GetTable(parent)
+
+end
+
+
+function WindowGameOver:ObjectOnNew()
+    self.window = LuaWindowBuilder.Construct(self)
+    self.inputKeysManager = InputKeysManager.Instance()
+    local gameObject = self.gameObject
+    self.canvasGroup = gameObject:SetComponent(typeof(CanvasGroup))
+    self.canvasGroup.alpha = 0
+    self.canvasGroup.interactable = false
+
+    self.returnBtn = gameObject:SetComponent(typeof(Button), "ReturnBtn")
+    self.returnBtn.gameObject:SetComponent(typeof(LanguageText), "Text"):SetPath("结算页面/返回")
+
+    self.title = gameObject:SetComponent(typeof(Text), "Title")
+    self.level = gameObject:SetComponent(typeof(Text), "Level")
+    self.score = gameObject:SetComponent(typeof(Text), "Score")
+
+end
+
+
+function WindowGameOver:ObjectOnDestroy()
+
+end
+
+
+function WindowGameOver:ObjectOnGet()
+    local transform = self.transform
+    transform:SetParent(CanvasServer.Instance():GetLayer(CD.Layer1, ""))
+    transform:GetRectTransform():RectAllStretch()
+    transform:Default()
+end
+
+
+function WindowGameOver:ObjectOnRecycle()
+
+end
+
+
+function WindowGameOver:WaitFocusStateEnter(EnterDone)
+    self.gameObject:SetActive(true)
+    self.canvasGroup:DOFade(1, CD.WindowFadeSpeed):SetUpdate(true):OnComplete(function()
+        EnterDone()
+        self.canvasGroup.interactable = true
+    end
+)
+end
+
+
+function WindowGameOver:WaitFocusStateExit(ExitDone)
+    self.canvasGroup.interactable = false
+    self.canvasGroup:DOFade(0, CD.WindowFadeSpeed):SetUpdate(true):OnComplete(function()
+        ExitDone()
+    end
+)
+end
+
+function WindowGameOver:FocusStateExit()
+    self.gameObject:SetActive(false)
+
+end
+
+
+function WindowGameOver:MonoUpdate()
+    if self.inputKeysManager:GetKeysDown("界面快捷键", "返回") then
+        if self.updateCallBack then
+            self.updateCallBack()
+        end
+    end
+end
+
+

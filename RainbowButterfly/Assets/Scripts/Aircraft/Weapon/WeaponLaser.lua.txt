@@ -1,0 +1,129 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/04/02 09:18:00
+
+ * 最后日期: 2022/04/02 09:18:21
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using 'LuaMonoObjectPoolBuilder'
+Script "WeaponBase"
+
+-- Mono对象池对象
+WeaponLaser = WeaponBase:Extend({TableName = 'WeaponLaser'})
+
+function WeaponLaser:ObjectOnNew()
+
+    self.spriteRenderer = self.gameObject:SetComponent(typeof(SpriteRenderer))
+    self.fireClock = Clock.Get()
+
+end
+
+function WeaponLaser:ObjectOnGet()
+    self.transform.localEulerAngles = Vector3.zero
+    self.transform.localPosition = Vector3.zero
+
+    self.bullets = {}
+    self.preheatTime = 0
+
+    self.fireClock.callBack = function()
+        if self.isFire then
+            self.fireClock:Run()
+            self:BuildBullet()
+
+        end
+    end
+
+end
+function WeaponLaser:BuildBullet()
+
+    if #self.bullets > self.multiple then
+        self.bullets[#self.bullets]:ObjectRecycle()
+    end
+    while #self.bullets < self.multiple do
+        local bullet = self.bulletGet()
+        bullet:SetWeapon(self)
+        bullet.transform:SetParent(self.transform)
+        table.insert(self.bullets, bullet) -- 末端插入数据
+        bullet:Active()
+    end
+
+    if #self.bullets > 1 then
+        for i = 0, self.multiple - 1, 1 do
+            local localAngle = self.diffusion / (self.multiple - 1) * i
+            local angle = localAngle - self.diffusion * 0.5
+
+            local bullet = self.bullets[i + 1]
+            if bullet then
+                bullet.transform.localPosition = Vector3.zero
+
+                local eulerAngle = self.transform.localEulerAngles
+                eulerAngle.z = angle
+                bullet.transform.localEulerAngles = eulerAngle
+            end
+
+        end
+    elseif #self.bullets == 1 then
+        local bullet = self.bullets[1]
+        bullet.transform.localPosition = Vector3.zero
+        bullet.transform.localEulerAngles = Vector3.zero
+
+    end
+end
+
+function WeaponLaser:Fire()
+    self.isPreheat = true
+    self.spriteRenderer.color = self.spriteRenderer.color:A(1)
+    self.fireClock.time = self.interval
+    self:BuildBullet()
+end
+
+function WeaponLaser:CeaseFire()
+    self.isPreheat = false
+
+    self.spriteRenderer.color = self.spriteRenderer.color:A(0.5)
+
+end
+
+function WeaponLaser:ObjectOnDestroy() end
+
+function WeaponLaser:ObjectOnRecycle()
+    self.preheatTime = 0
+    self.isPreheat = false
+    self.isFire = false
+    self.fireClock:Stop()
+
+    for key, bullet in pairs(self.bullets) do bullet:ObjectRecycle() end
+
+end
+
+function WeaponLaser:MonoLateUpdate()
+
+    if self.isPreheat then
+        self.preheatTime = self.preheatTime + Time.deltaTime
+    else
+        self.preheatTime = self.preheatTime - Time.deltaTime
+    end
+    self.preheatTime = Mathf.Clamp(self.preheatTime, 0, self.preheat)
+    local timeWidth = self.preheatTime / self.preheat
+    local valve = Mathf.Pow(timeWidth, 4)
+
+    for key, bullet in pairs(self.bullets) do
+        bullet:SetWidth(valve)
+        bullet:Hit(valve > 0.3)
+    end
+
+    if valve > 0.5 then
+        self.isFire = true
+        if not self.fireClock.isRun then self.fireClock:Run() end
+    else
+        self.isFire = false
+    end
+
+end
+

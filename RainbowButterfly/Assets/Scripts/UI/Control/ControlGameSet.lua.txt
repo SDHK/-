@@ -1,0 +1,224 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/12 17:16:22
+
+ * 最后日期: 2022/02/12 17:18:03
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using 'LuaObjectPoolBuilder'
+using 'LuaSingletonItem'
+
+Script "CD"
+Script "WindowGameSet"
+
+
+
+ControlGameSet = LuaSingletonItem:Extend({
+    TableName = "ControlGameSet"
+})
+
+ControlGameSet.pool = LuaObjectPoolBuilder.Construct(ControlGameSet)
+
+-- 获取对象
+function ControlGameSet.Get()
+    return ControlGameSet.pool:Get()
+end
+
+
+function ControlGameSet:ObjectOnNew()
+    ControlGameSet.AsyncLoadGameSet()
+    ControlGameSet.AsyncLoadInputKeys()
+    ControlGameSet.AsyncLoadScreen()
+
+
+    self.languageManager = LanguageManager.Instance()
+    self.inputKeysManager = InputKeysManager.Instance()
+    self.screenManager = ScreenManager.Instance()
+
+ 
+
+end
+
+
+function ControlGameSet:ObjectOnDestroy()
+
+end
+
+
+function ControlGameSet:ObjectOnGet()
+
+    self.view = WindowGameSet:Instance()
+    self.view.windowClose = function()
+        WindowManager.Instance():Close(self.view.window)
+    end
+
+
+    self.view.returnBtn.onClick:AddListener(self.view.windowClose)
+
+    -- PageGameSet
+    self.view.pageGameSet.defaultSettingsBtn.onClick:AddListener(function()
+        local windowConfirm = WindowConfirm.Get()
+        windowConfirm:Refresh(self.languageManager.Data:Get("提示/恢复默认设置确认") or "", function(bit)
+            if bit then
+                coroutine.wrap(function()
+                    ControlGameSet.AsyncLoadGameSetDefault()
+                end
+)()
+            end
+        end
+)
+        WindowManager.Instance():Show(windowConfirm.window)
+    end
+)
+    -- PageKeyBind
+    self.view.pageKeyBind.defaultSettingsBtn.onClick:AddListener(function()
+        local windowConfirm = WindowConfirm.Get()
+        windowConfirm:Refresh(self.languageManager.Data:Get("提示/恢复默认设置确认") or "", function(bit)
+            if bit then
+                coroutine.wrap(function()
+                    ControlGameSet.AsyncLoadInputKeysDefault()
+                    AsyncDelay(10) -- !InputKeysManager只等待了文件异步加载，没有等待json转换
+                    self.view.pageKeyBind:Refresh() -- 刷新的是自己
+                end
+)()
+            end
+        end
+)
+        WindowManager.Instance():Show(windowConfirm.window)
+    end
+)
+
+    -- PageScreen
+    self.view.pageScreen.defaultSettingsBtn.onClick:AddListener(function()
+        local windowConfirm = WindowConfirm.Get()
+        windowConfirm:Refresh(self.languageManager.Data:Get("提示/恢复默认设置确认") or "", function(bit)
+            if bit then
+                coroutine.wrap(function()
+                    ControlGameSet.AsyncLoadScreenDefault()
+                    self.view.pageScreen:Refresh() -- 刷新的是自己
+                end
+)()
+            end
+        end
+)
+        WindowManager.Instance():Show(windowConfirm.window)
+    end
+)
+
+end
+
+
+function ControlGameSet:ObjectOnRecycle()
+
+    self.view:ObjectRecycle()
+    self.view = nil
+end
+
+
+
+function ControlGameSet:Show()
+    WindowManager:Instance():Show(self.view.window)
+end
+
+
+function ControlGameSet:Close()
+    WindowManager:Instance():Close(self.view.window)
+end
+
+
+
+
+function ControlGameSet.AsyncLoad(asyncOperation)
+    AsyncWaitOperation(asyncOperation)
+    local request = asyncOperation.webRequest
+    if request.isHttpError or request.isNetworkError then
+        print("GameData Loda Error")
+    else
+        local pathdata = PathAssetLoader.Convert_BytesToObject(request.downloadHandler.data)
+        GlobalAsset:Set(pathdata, "GameSet")
+        ControlGameSet.Refresh()
+    end
+end
+
+
+function ControlGameSet.AsyncLoadGameSet()
+    ControlGameSet.AsyncLoad(UnityWebRequest.Get(Application.streamingAssetsPath .. CD.PathGameData):SendWebRequest())
+end
+
+
+function ControlGameSet.AsyncLoadGameSetDefault()
+    ControlGameSet.AsyncLoad(
+        UnityWebRequest.Get(Application.streamingAssetsPath .. CD.PathGameDataDefault):SendWebRequest())
+end
+
+
+function ControlGameSet.SaveGameSet()
+    File.WriteAllBytes(Application.streamingAssetsPath .. CD.PathGameData,
+        PathAssetLoader.Convert_ObjectToBytes(GlobalAsset:Get("GameSet")))
+end
+
+
+function ControlGameSet.Refresh()
+    -- 语言填装
+    LanguageManager.Instance().Data = GlobalAsset:Node("LanguageSwitch/" .. GlobalAsset:Get("GameSet/Language"))
+    LanguageManager.Instance():RefreshBoxs()
+end
+
+
+--
+
+function ControlGameSet.AsyncLoadInputKeys()
+    local inputKeysManager = InputKeysManager.Instance()
+    inputKeysManager.RootPath = 1
+    inputKeysManager.path = CD.PathInputKeys
+    AsyncWaitOperation(inputKeysManager:Load())
+end
+
+
+function ControlGameSet.AsyncLoadInputKeysDefault()
+    local inputKeysManager = InputKeysManager.Instance()
+    inputKeysManager.RootPath = 1
+    inputKeysManager.path = CD.PathInputKeysDefault
+    AsyncWaitOperation(inputKeysManager:Load())
+end
+
+
+function ControlGameSet.SaveInputKeys()
+    local inputKeysManager = InputKeysManager.Instance()
+    inputKeysManager.RootPath = 1
+    inputKeysManager.path = CD.PathInputKeys
+    inputKeysManager:Save()
+end
+
+
+---
+function ControlGameSet.AsyncLoadScreen()
+    local screenManager = ScreenManager.Instance()
+    screenManager.RootPath = 1
+    screenManager.path = CD.PathScreenResolution
+    AsyncWaitOperation(screenManager:Load())
+end
+
+
+function ControlGameSet.AsyncLoadScreenDefault()
+    local screenManager = ScreenManager.Instance()
+    screenManager.RootPath = 1
+    screenManager.path = CD.PathScreenResolutionDefault
+    AsyncWaitOperation(screenManager:Load())
+end
+
+
+function ControlGameSet.SaveScreen()
+    local screenManager = ScreenManager.Instance()
+    screenManager.RootPath = 1
+    screenManager.path = CD.PathScreenResolution
+    screenManager:Save()
+end
+
+

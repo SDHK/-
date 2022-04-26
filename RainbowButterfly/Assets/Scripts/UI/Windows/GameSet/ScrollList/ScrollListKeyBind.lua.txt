@@ -1,0 +1,131 @@
+﻿--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/02/10 23:07:08
+
+ * 最后日期: 2022/02/10 23:07:37
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]] --------------------
+using "LuaMonoObjectPoolBuilder"
+Script "WindowConfirm"
+Script "WindowMask"
+
+-- Mono对象池对象
+ScrollListKeyBind = LuaMonoObjectItem:Extend({TableName = "ScrollListKeyBind"})
+ScrollListKeyBind.pool = LuaMonoObjectPoolBuilder.Construct(ScrollListKeyBind,
+                                                            GlobalAsset:Get(
+                                                                CD.ABpfb_ui,
+                                                                CD.AB_ScrollListKeyBind,
+                                                                typeof(
+                                                                    GameObject):ToString()))
+
+ScrollListKeyBind.pool.objectDestoryClock = 600
+
+-- 获取对象
+function ScrollListKeyBind.Get() return ScrollListKeyBind.pool:GetTable() end
+
+-- 获取对象，并设置父物体
+function ScrollListKeyBind.Get(parent)
+    return ScrollListKeyBind.pool:GetTable(parent)
+end
+
+function ScrollListKeyBind:ObjectOnNew()
+    self.inputKeysManager = InputKeysManager.Instance()
+    self.languageManager = LanguageManager.Instance()
+
+    local gameObject = self.gameObject
+    self.keyText = gameObject:SetComponent(typeof(LanguageText), "KeyText")
+    self.keyBtn = gameObject:SetComponent(typeof(Button), "KeyBtn")
+    self.keyBtnText = self.keyBtn.gameObject:SetComponent(typeof(Text), "Text")
+
+    self.KeyBtn = function()
+        WindowMask.Show()
+        self.inputKeysManager:RecordKeys(self.group, self.key)
+
+        self.inputKeysManager.recordUpdateEvent =
+            function(group, key, keyCodes)
+                self.keyBtnText.text = (keyCodes:ToString() or "")
+            end
+
+        self.inputKeysManager.recordDoneEvent =
+            function(group, key, keyCodes, newKeyCodes, repeatNames)
+                local logText = ""
+                if repeatNames.Count > 0 then
+                    logText =
+                        "[" .. self.languageManager.Data:Get(group, key) ..
+                            "]\n\n" .. (keyCodes:ToString() or "") .. "-->" ..
+                            (newKeyCodes:ToString() or "") .. "\n"
+                    logText = logText ..
+                                  self.languageManager.Data:Get(
+                                      "提示/同组按键冲突提示") or ""
+                    for intdex, keyName in pairs(repeatNames) do
+                        logText = logText .. "\n[" ..
+                                      (self.languageManager.Data:Get(group,
+                                                                     keyName) or
+                                          (group .. "/" .. keyName)) .. "]"
+                    end
+
+                    if WindowManager.Instance().IsDone then
+                        local windowConfirm = WindowConfirm.Get()
+                        windowConfirm:Refresh(logText, nil)
+                        WindowManager.Instance():Show(windowConfirm.window)
+                    end
+
+                    self.keyBtnText.text = (keyCodes:ToString() or "")
+                elseif newKeyCodes.Codes.Count > newKeyCodes.limit then
+                    logText =
+                        "[" .. self.languageManager.Data:Get(group, key) ..
+                            "]\n\n" ..
+                            (self.languageManager.Data:Get(
+                                "提示/按键数超量提示") or "") ..
+                            keyCodes.Codes.Count
+                    if WindowManager.Instance().IsDone then
+                        local windowConfirm = WindowConfirm.Get()
+                        windowConfirm:Refresh(logText, nil)
+                        WindowManager.Instance():Show(windowConfirm.window)
+                    end
+                    self.keyBtnText.text = (keyCodes:ToString() or "")
+                else
+                    logText =
+                        "[" .. self.languageManager.Data:Get(group, key) ..
+                            "]\n\n" ..
+                            (self.languageManager.Data:Get(
+                                "提示/按键替换确认") or "") .. "\n" ..
+                            (keyCodes:ToString() or "") .. "-->" ..
+                            (newKeyCodes:ToString() or "")
+                    if WindowManager.Instance().IsDone then
+                        local windowConfirm = WindowConfirm.Get()
+                        windowConfirm:Refresh(logText, function(bit)
+                            if bit then
+                                self.inputKeysManager:SetKeyCodes(group, key,
+                                                                  newKeyCodes)
+                                self.keyBtnText.text =
+                                    (newKeyCodes:ToString() or "")
+                            else
+                                self.keyBtnText.text =
+                                    (keyCodes:ToString() or "")
+                            end
+                        end)
+                        WindowManager.Instance():Show(windowConfirm.window)
+                    end
+                end
+                self.inputKeysManager.recordUpdateEvent = nil
+                self.inputKeysManager.recordDoneEvent = nil
+                WindowMask.Close()
+            end
+    end
+    self.keyBtn.onClick:AddListener(self.KeyBtn)
+end
+function ScrollListKeyBind:ObjectOnGet() self.transform:Default() end
+function ScrollListKeyBind:Refresh(group, key)
+    self.group = group
+    self.key = key
+    self.keyText:SetPath(group .. "/" .. key)
+    self.keyBtnText.text = (self.inputKeysManager:GetKeyCodes(group, key)
+                               :ToString() or "")
+end

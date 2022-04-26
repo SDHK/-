@@ -1,0 +1,70 @@
+﻿
+--[[--------------------
+
+ * Author: 闪电黑客
+
+ * 日期: 2022/03/08 08:50:17
+
+ * 最后日期: 2022/03/08 08:50:46
+
+ * 最后修改: 闪电黑客
+
+ * 描述:  
+
+--]]--------------------
+
+using 'LuaObjectPoolBuilder'
+using "LuaFocusStateBuilder"
+using "LuaSingletonItem"
+
+-- 对象池对象
+StateGameStop = LuaSingletonItem:Extend({ TableName = 'StateGameStop'})
+StateGameStop.pool = LuaObjectPoolBuilder.Construct(StateGameStop)
+
+
+-- 获取对象
+function StateGameStop.Get()
+    return StateGameStop.pool:Get()
+end
+
+
+function StateGameStop:ObjectOnNew()
+    self.focusState = LuaFocusStateBuilder.Construct(self)
+    self.inputKeysManager = InputKeysManager.Instance()
+
+end
+
+
+function StateGameStop:ObjectOnDestroy()
+    self.focusState = nil
+
+end
+
+
+function StateGameStop:ObjectOnGet()
+    
+
+end
+
+
+function StateGameStop:ObjectOnRecycle()
+   
+end
+
+function StateGameStop:FocusStateUpdate()
+    if self.inputKeysManager:GetKeysDown("界面快捷键", "返回") then
+        GlobalAsset:Get("游戏流程状态机"):Set(StatePlay:Instance().focusState)
+    end
+end
+
+function StateGameStop:FocusStateEnter()
+    print("StateGameStop进入！")
+    Time.timeScale =0;
+
+end
+
+function StateGameStop:FocusStateExit()
+    print("StateGameStop退出！")
+    Time.timeScale =1;
+    -- WindowManager.Instance():Clear()
+end
